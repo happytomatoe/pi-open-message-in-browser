@@ -12,7 +12,7 @@ export function generateHtmlDocument(body: string, css: string, js: string, them
         html {
             background-color: ${bgColor};
         }
-        body {
+        body.markdown-body {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
