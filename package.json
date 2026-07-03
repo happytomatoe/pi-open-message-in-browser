@@ -1,6 +1,6 @@
 {
   "name": "pi-open-message-in-browser",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Opens the last assistant response in a browser with GitHub styling and Mermaid support",
   "keywords": ["pi-package"],
   "main": "index.ts",
