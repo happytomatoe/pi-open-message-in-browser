@@ -17,9 +17,13 @@ pi install npm:pi-open-message-in-browser
 ## 📖 Usage
 ```
 /open-message-in-browser
-# To change settings - browser and file path
+# To change settings - browser, file path, and theme (light/dark/auto)
 /open-message-in-browser:settings
 ```
+
+By default, the exported page uses the **light** GitHub theme regardless of your
+OS/browser color-scheme preference. Choose `dark` to always force dark, or `auto`
+to follow the browser's `prefers-color-scheme` setting instead.
 ## 🏗️ How it works
 
 ```mermaid
