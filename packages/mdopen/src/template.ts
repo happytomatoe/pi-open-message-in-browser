@@ -17,13 +17,14 @@ export function generateHtmlDocument(body: string, css: string, js: string, them
             margin: 0 auto;
             padding: 20px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            text-align: center;
         }
         ${css}
     </style>
 </head>
 <body class="markdown-body">
     ${body}
-    <script type="module">
+    <script>
         ${js}
         mermaid.initialize({ startOnLoad: true, theme: '${mermaidTheme}' });
     </script>
