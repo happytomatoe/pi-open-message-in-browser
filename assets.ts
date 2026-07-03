@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const GITHUB_CSS_PATH = path.join(__dirname, 'node_modules', 'github-markdown-css', 'github-markdown.css');
-const MERMAID_JS_PATH = path.join(__dirname, 'node_modules', 'mermaid', 'dist', 'mermaid.min.js');
+const GITHUB_CSS_PATH = path.join(__dirname, 'assets', 'github-markdown.css');
+const MERMAID_JS_PATH = path.join(__dirname, 'assets', 'mermaid.min.js');
 
 export async function getAssets(): Promise<{ css: string, js: string }> {
     try {

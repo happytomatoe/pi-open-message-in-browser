@@ -11,7 +11,7 @@ Reading a wall of markdown text in terminal is not a great experience. Better wa
 To install this tool using `pi`, run:
 
 ```bash
-pi install git:https://github.com/happytomatoe/pi-open-message-in-browser
+pi install npm:pi-open-message-in-browser
 ```
 
 ## 📖 Usage
