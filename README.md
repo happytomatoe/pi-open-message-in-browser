@@ -20,11 +20,7 @@ pi install git+https://github.com/happytomatoe/pi-open-message-in-browser
 # To change settings - browser and file path
 /open-message-in-browser:settings
 ```
-```
-```
-## 🏗️ Architecture
-
-The following diagram illustrates how the extension processes messages:
+## 🏗️ How it works
 
 ```mermaid
 graph LR
