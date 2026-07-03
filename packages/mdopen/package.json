@@ -1,0 +1,35 @@
+{
+  "name": "mdopen",
+  "version": "0.1.0",
+  "description": "Convert Markdown to GitHub-styled HTML (with syntax highlighting and Mermaid support) and open it in a browser",
+  "keywords": ["markdown", "html", "mermaid", "shiki", "cli"],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "mdopen": "./bin/mdopen.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "bun run build"
+  },
+  "dependencies": {
+    "github-markdown-css": "^5.8.0",
+    "marked": "^12.0.0",
+    "mermaid": "^11.4.0",
+    "shiki": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.0",
+    "typescript": "^5.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/happytomatoe/pi-open-message-in-browser",
+    "directory": "packages/mdopen"
+  },
+  "license": "MIT"
+}

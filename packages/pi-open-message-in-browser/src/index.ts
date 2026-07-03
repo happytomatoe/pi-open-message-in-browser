@@ -1,9 +1,6 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { loadSettings, saveSettings, type Settings } from "./settings";
-import { getAssets } from "./assets";
-import { convertMarkdownToHtml } from "./converter";
-import { generateHtmlDocument } from "./template";
-import { writeAndOpenHtml } from "./browser";
+import { getAssets, convertMarkdownToHtml, generateHtmlDocument, writeAndOpenHtml } from "mdopen";
 
 export default function openLastInBrowserExtension(pi: ExtensionAPI) {
 	pi.registerCommand("open-last-in-browser", {
@@ -42,7 +39,11 @@ export default function openLastInBrowserExtension(pi: ExtensionAPI) {
 				const htmlBody = convertMarkdownToHtml(text);
 				const fullHtml = generateHtmlDocument(htmlBody, css, js, settings.theme);
 				
-				const { filePath, opened } = await writeAndOpenHtml(fullHtml);
+				const { filePath, opened } = await writeAndOpenHtml(fullHtml, {
+					browser: settings.browser,
+					exportDir: settings.exportDir,
+					filenamePrefix: "pi-export",
+				});
 				if (opened) {
 					ctx.ui.notify("Opened in browser!", "success");
 				} else {

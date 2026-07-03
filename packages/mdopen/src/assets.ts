@@ -1,8 +1,5 @@
-import * as fs from 'node:fs';
-import { createRequire } from 'node:module';
-import type { Theme } from './settings';
-
-const require = createRequire(import.meta.url);
+import * as fs from 'fs';
+import type { Theme } from './types';
 
 function cssFileForTheme(theme: Theme): string {
     switch (theme) {
