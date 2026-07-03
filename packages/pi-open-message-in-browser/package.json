@@ -1,0 +1,22 @@
+{
+  "name": "pi-open-message-in-browser",
+  "version": "0.1.2",
+  "description": "Opens the last assistant response in a browser with GitHub styling and Mermaid support",
+  "keywords": ["pi-package"],
+  "main": "src/index.ts",
+  "pi": {
+    "extensions": ["src/index.ts"]
+  },
+  "dependencies": {
+    "mdopen": "^0.1.0"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/happytomatoe/pi-open-message-in-browser",
+    "directory": "packages/pi-open-message-in-browser"
+  },
+  "license": "MIT"
+}

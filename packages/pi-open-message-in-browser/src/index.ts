@@ -1,9 +1,6 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { loadSettings, saveSettings } from "./settings";
-import { getAssets } from "./assets";
-import { convertMarkdownToHtml } from "./converter";
-import { generateHtmlDocument } from "./template";
-import { writeAndOpenHtml } from "./browser";
+import { loadSettings, saveSettings, type Settings } from "./settings";
+import { getAssets, convertMarkdownToHtml, generateHtmlDocument, writeAndOpenHtml } from "mdopen";
 
 export default function openLastInBrowserExtension(pi: ExtensionAPI) {
 	pi.registerCommand("open-last-in-browser", {
@@ -37,11 +34,16 @@ export default function openLastInBrowserExtension(pi: ExtensionAPI) {
 
 			try {
 				ctx.ui.notify("Generating HTML...", "info");
-				const { css, js } = await getAssets();
+				const settings = loadSettings();
+				const { css, js } = await getAssets(settings.theme);
 				const htmlBody = convertMarkdownToHtml(text);
-				const fullHtml = generateHtmlDocument(htmlBody, css, js);
+				const fullHtml = generateHtmlDocument(htmlBody, css, js, settings.theme);
 				
-				const { filePath, opened } = await writeAndOpenHtml(fullHtml);
+				const { filePath, opened } = await writeAndOpenHtml(fullHtml, {
+					browser: settings.browser,
+					exportDir: settings.exportDir,
+					filenamePrefix: "pi-export",
+				});
 				if (opened) {
 					ctx.ui.notify("Opened in browser!", "success");
 				} else {
@@ -65,9 +67,13 @@ export default function openLastInBrowserExtension(pi: ExtensionAPI) {
 			const newExportDir = await ctx.ui.input("Export Directory", settings.exportDir);
 			if (newExportDir === undefined) return; // Cancelled
 
+			const newTheme = await ctx.ui.select(`Theme (current: ${settings.theme})`, ["light", "dark", "auto"]);
+			if (newTheme === undefined) return; // Cancelled
+
 			saveSettings({
 				browser: newBrowser || settings.browser,
-				exportDir: newExportDir || settings.exportDir
+				exportDir: newExportDir || settings.exportDir,
+				theme: (newTheme as Settings["theme"]) || settings.theme
 			});
 
 			ctx.ui.notify("Settings saved!", "success");

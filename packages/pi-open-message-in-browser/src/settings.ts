@@ -1,9 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+export type Theme = 'light' | 'dark' | 'auto';
+
 export interface Settings {
   browser: string;
   exportDir: string;
+  theme: Theme;
 }
 
 const SETTINGS_FILE = path.join(__dirname, 'settings.json');
@@ -11,7 +14,8 @@ const SETTINGS_FILE = path.join(__dirname, 'settings.json');
 const defaultBrowser = process.platform === 'darwin' ? 'open' : 'xdg-open';
 const defaultSettings: Settings = {
   browser: defaultBrowser,
-  exportDir: '/tmp'
+  exportDir: '/tmp',
+  theme: 'light'
 };
 
 export function loadSettings(): Settings {

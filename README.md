@@ -1,39 +1,29 @@
-# pi-open-message-in-browser
+# pi-open-message-in-browser (monorepo)
 
-Pi extension to open the last assistant message in a browser with Github flavor markdown preview and Mermaid support.
+This repo is a bun workspaces monorepo with two packages:
 
-## ❓ The Problem
+- [`packages/mdopen`](packages/mdopen) — core Markdown → HTML conversion
+  (GitHub styling, highlight.js syntax highlighting, Mermaid diagrams), plus
+  the standalone `mdopen` CLI. Zero `pi` dependency; published to npm as
+  [`mdopen`](https://www.npmjs.com/package/mdopen).
+- [`packages/pi-open-message-in-browser`](packages/pi-open-message-in-browser) —
+  the `pi` extension that opens the last assistant response in a browser. Thin
+  wrapper around `mdopen`; published to npm as
+  [`pi-open-message-in-browser`](https://www.npmjs.com/package/pi-open-message-in-browser).
 
-Reading a wall of markdown text in terminal is not a great experience. Better way is to open that in a browser with markdown and mermaid support
+## Install
 
-## 🛠️ Installation
+- As a `pi` extension: `pi install npm:pi-open-message-in-browser`
+- As a standalone CLI: `npm install -g mdopen`
 
-To install this tool using `pi`, run:
+See each package's README for usage details.
+
+## Development
 
 ```bash
-pi install npm:pi-open-message-in-browser
+bun install               # link workspaces
+bun run --filter mdopen build
 ```
-
-## 📖 Usage
-```
-/open-message-in-browser
-# To change settings - browser and file path
-/open-message-in-browser:settings
-```
-## 🏗️ How it works
-
-```mermaid
-graph LR
-    A[pi Agent] -- trigger --> B[pi-open-message-in-browser]
-    B -- fetches --> C[Last Assistant Message]
-    C -- renders --> D[HTML + Markdown/Mermaid]
-    D -- writes to --> E[Local File System]
-    E -- opens in --> F[Web Browser]
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📜 License
 
