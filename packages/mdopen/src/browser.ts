@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
 export interface WriteAndOpenOptions {
     /** Command used to open the file, e.g. "open" (macOS) or "xdg-open" (Linux). */
@@ -27,15 +27,16 @@ export function writeAndOpenHtml(html: string, options: WriteAndOpenOptions): Pr
         fs.mkdirSync(path.dirname(filePath), { recursive: true });
         fs.writeFileSync(filePath, html, 'utf8');
 
-        const command = `${options.browser} "${filePath}"`;
-
-        exec(command, (error: Error | null) => {
-            if (error) {
-                console.error(`exec error: ${error}`);
-                resolve({ filePath, opened: false });
-                return;
-            }
+        const [command, ...args] = options.browser.split(/\s+/);
+        try {
+            const child = spawn(command, [...args, filePath], {
+                detached: true,
+                stdio: 'ignore',
+            });
+            child.unref();
             resolve({ filePath, opened: true });
-        });
+        } catch {
+            resolve({ filePath, opened: false });
+        }
     });
 }
