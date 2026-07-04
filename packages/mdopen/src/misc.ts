@@ -1,0 +1,64 @@
+export const MISC_CSS = `
+/* Print styles */
+@media print {
+  h1, h2, h3, h4 {
+    break-after: avoid;
+  }
+  pre, blockquote, summary, table, math, svg {
+    break-inside: avoid;
+  }
+  body._toc-left { padding-left: 0px !important; }
+  body._toc-right { padding-right: 0px !important; }
+  #_toc { display: none !important; }
+  .markdown-body { border: 0; padding: 20px; }
+  pre, pre code, pre[class*=language-], code[class*=language-] {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+  }
+}
+
+/* Scrollbar styling */
+@media (prefers-color-scheme: light) {
+  body {
+    --scrollbar-track: #efefef;
+    --scrollbar-thumb: #d5d5d5;
+    --scrollbar-thumb-hover: #c4c4c4;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    --scrollbar-track: #424242;
+    --scrollbar-thumb: #686868;
+    --scrollbar-thumb-hover: #7b7b7b;
+  }
+}
+::-webkit-scrollbar,
+::-webkit-scrollbar-corner {
+  height: 10px;
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Misc */
+pre:has(> code.mermaid) {
+  resize: vertical;
+  overflow: auto;
+}
+.markdown-body code.mermaid {
+  display: block;
+  height: 100%;
+}
+svg[id^=mermaid] text {
+  stroke: none !important;
+}
+`;

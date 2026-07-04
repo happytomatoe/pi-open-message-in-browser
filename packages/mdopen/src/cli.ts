@@ -6,15 +6,22 @@ import { generateHtmlDocument } from './template';
 import { getAssets } from './assets';
 import { writeAndOpenHtml } from './browser';
 import type { Theme } from './types';
+import type { CompilerName, CompilerOptions } from './compilers';
 
-const VALID_THEMES: Theme[] = ['light', 'dark', 'auto'];
+const VALID_COMPILERS: CompilerName[] = ['markdown-it', 'marked', 'commonmark', 'remarkable'];
 
 interface CliArgs {
     file?: string;
     theme: Theme;
+    compiler?: CompilerName;
+    compilerOptions?: CompilerOptions;
     out?: string;
     browser: string;
     open: boolean;
+    toc: boolean;
+    math: boolean;
+    emoji: boolean;
+    width?: string;
 }
 
 function printHelp(): void {
@@ -24,15 +31,22 @@ Usage:
   mdopen <file.md> [options]
 
 Options:
-  -t, --theme <light|dark|auto>   Theme to use (default: light)
-  -o, --out <file.html>           Write HTML to this path instead of a temp file
-  -b, --browser <command>         Command used to open the file (default: "open" on macOS, "xdg-open" elsewhere)
-  -n, --no-open                   Only convert/write the HTML, do not open a browser
-  -h, --help                      Show this help message
+  -t, --theme <theme>                    Theme to use (default: light)
+  -c, --compiler <compiler>            Compiler to use (default: markdown-it)
+                                       Options: markdown-it, marked, commonmark, remarkable
+  --toc                                 Generate a Table of Contents sidebar
+  --math                                Enable MathJax for LaTeX rendering
+  --emoji                               Enable emoji rendering (:emoji:)
+  --width <width>                       Content width (auto, full, wide, large, medium, small, tiny)
+  -o, --out <file.html>                Write HTML to this path instead of a temp file
+  -b, --browser <command>              Command used to open the file (default: "open" on macOS, "xdg-open" elsewhere)
+  -n, --no-open                        Only convert/write the HTML, do not open a browser
+  -h, --help                           Show this help message
 
 Examples:
   mdopen README.md
   mdopen notes.md --theme dark
+  mdopen notes.md --compiler marked
   mdopen notes.md --out notes.html --no-open
 `);
 }
@@ -44,6 +58,9 @@ function parseArgs(argv: string[]): CliArgs {
         out: undefined,
         browser: process.platform === 'darwin' ? 'open' : 'xdg-open',
         open: true,
+        toc: false,
+        math: false,
+        emoji: false,
     };
 
     for (let i = 0; i < argv.length; i++) {
@@ -57,10 +74,37 @@ function parseArgs(argv: string[]): CliArgs {
             case '-t':
             case '--theme': {
                 const value = argv[++i];
-                if (!value || !VALID_THEMES.includes(value as Theme)) {
-                    throw new Error(`--theme must be one of: ${VALID_THEMES.join(', ')}`);
+                if (!value) {
+                    throw new Error('--theme requires a value');
                 }
                 args.theme = value as Theme;
+                break;
+            }
+            case '-c':
+            case '--compiler': {
+                const value = argv[++i];
+                if (!value || !VALID_COMPILERS.includes(value as CompilerName)) {
+                    throw new Error(`--compiler must be one of: ${VALID_COMPILERS.join(', ')}`);
+                }
+                args.compiler = value as CompilerName;
+                break;
+            }
+            case '--toc':
+                args.toc = true;
+                break;
+            case '--math':
+                args.math = true;
+                break;
+            case '--emoji':
+                args.emoji = true;
+                break;
+            case '--width': {
+                const value = argv[++i];
+                const validWidths = ['auto', 'full', 'wide', 'large', 'medium', 'small', 'tiny'];
+                if (!value || !validWidths.includes(value)) {
+                    throw new Error(`--width must be one of: ${validWidths.join(', ')}`);
+                }
+                args.width = value;
                 break;
             }
             case '-o':
@@ -115,9 +159,9 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     }
 
     const markdown = fs.readFileSync(inputPath, 'utf8');
-    const htmlBody = await convertMarkdownToHtml(markdown, args.theme);
+    const { html: htmlBody, metadata } = await convertMarkdownToHtml(markdown, args.theme, args.compiler, args.compilerOptions);
     const { css, js } = await getAssets(args.theme);
-    const fullHtml = generateHtmlDocument(htmlBody, css, js, args.theme);
+    const fullHtml = generateHtmlDocument(htmlBody, css, js, args.theme, args.toc, metadata, args.width, args.math, args.emoji);
 
     const outputPath = args.out
         ? path.resolve(process.cwd(), args.out)

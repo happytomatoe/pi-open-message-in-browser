@@ -1,65 +1,61 @@
-import { marked } from 'marked';
-import { createHighlighter, bundledLanguages, type Highlighter } from 'shiki';
+import * as yaml from 'js-yaml';
+import * as toml from 'toml';
 import type { Theme } from './types';
+import { type CompilerName, type CompilerOptions, getDefaultCompiler, getCompiler } from './compilers';
 
-// Shiki themes to load. `auto` falls back to the light theme (same as the
-// previous highlight.js-based behaviour, which had no OS-follow variant).
-const SHIKI_THEME: Record<Theme, string> = {
-    light: 'github-light',
-    dark: 'github-dark',
-    auto: 'github-light',
-};
-
-let highlighterPromise: Promise<Highlighter> | undefined;
-const loadedLangs = new Set<string>(['plaintext']);
-
-function getHighlighter(): Promise<Highlighter> {
-    if (!highlighterPromise) {
-        highlighterPromise = createHighlighter({
-            themes: Object.values(SHIKI_THEME),
-            langs: ['plaintext'],
-        });
+/** Extracts YAML or TOML frontmatter from markdown. */
+function parseFrontmatter(markdown: string): { metadata: any, content: string } {
+    const regex = /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---\s*([\r\n]+|$)/;
+    const match = markdown.match(regex);
+    if (!match) {
+        return { metadata: {}, content: markdown };
     }
-    return highlighterPromise;
-}
-
-/** Collects the set of fenced-code-block languages used in the markdown, so we
- * only ask Shiki to load grammars that are actually needed (and recognised). */
-function collectLanguages(markdown: string): string[] {
-    const langs = new Set<string>();
-    const fenceRe = /^```([^\s`]+)/gm;
-    let match: RegExpExecArray | null;
-    while ((match = fenceRe.exec(markdown))) {
-        const lang = match[1].toLowerCase();
-        if (lang !== 'mermaid' && lang in bundledLanguages) {
-            langs.add(lang);
+    
+    const frontmatter = match[1];
+    let metadata: any = {};
+    
+    try {
+        const yamlData = yaml.load(frontmatter);
+        if (yamlData && typeof yamlData === 'object' && !Array.isArray(yamlData)) {
+            metadata = yamlData;
+        } else {
+            throw new Error('Not a YAML object');
+        }
+    } catch (e) {
+        try {
+            const tomlData = toml.parse(frontmatter);
+            if (tomlData && typeof tomlData === 'object' && !Array.isArray(tomlData)) {
+                metadata = tomlData;
+            } else {
+                throw new Error('Not a TOML object');
+            }
+        } catch (e2) {
+            console.warn("Failed to parse frontmatter as YAML or TOML");
         }
     }
-    return [...langs];
+    
+    return { metadata, content: markdown.slice(match[0].length) };
 }
 
-export async function convertMarkdownToHtml(markdown: string, theme: Theme = 'light'): Promise<string> {
-    const highlighter = await getHighlighter();
-
-    const wantedLangs = collectLanguages(markdown).filter(lang => !loadedLangs.has(lang));
-    if (wantedLangs.length > 0) {
-        await highlighter.loadLanguage(...(wantedLangs as never[]));
-        wantedLangs.forEach(lang => loadedLangs.add(lang));
-    }
-
-    const shikiTheme = SHIKI_THEME[theme];
-    const renderer = new marked.Renderer();
-
-    renderer.code = function(code: string, infostring: string | undefined, _escaped: boolean) {
-        const lang = infostring?.split(' ')[0]?.toLowerCase();
-        if (lang === 'mermaid') {
-            return `<div class="mermaid">${code}</div>`;
-        }
-
-        const language = lang && bundledLanguages[lang as keyof typeof bundledLanguages] ? lang : 'plaintext';
-        return highlighter.codeToHtml(code, { lang: language, theme: shikiTheme });
-    };
-
-    marked.setOptions({ renderer });
-    return marked.parse(markdown) as string;
+export async function convertMarkdownToHtml(
+    markdown: string,
+    theme: Theme = 'light',
+    compiler?: CompilerName,
+    compilerOptions?: CompilerOptions
+): Promise<{ html: string, metadata: any }> {
+    const { metadata, content } = parseFrontmatter(markdown);
+    const compilerName = compiler || getDefaultCompiler();
+    const compilerImpl = getCompiler(compilerName);
+    
+    // Get compiler-specific options
+    const options = compilerOptions?.[compilerName];
+    
+    // Compile markdown to HTML
+    let html = compilerImpl.compile(content, options);
+    
+    // Post-process: add mermaid divs for code blocks with mermaid language
+    html = html.replace(/<pre><code class="language-mermaid">(.*?)<\/code><\/pre>/gs, 
+        '<div class="mermaid">$1</div>');
+    
+    return { html, metadata };
 }
