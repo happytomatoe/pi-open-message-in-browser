@@ -15,7 +15,7 @@ export const TOC_SCRIPT = `
 
   headings.forEach(heading => {
     const level = parseInt(heading.tagName.substring(1));
-    const text = heading.innerText;
+    const text = heading.textContent;
     const id = heading.id;
 
     while (stack.length > 1 && stack[stack.length - 1].level >= level) {

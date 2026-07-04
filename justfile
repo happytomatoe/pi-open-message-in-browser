@@ -1,8 +1,8 @@
 install:
-    cd packages/mdopen && bun run build && bun install /tmp/pi-open-message-in-browser/packages/mdopen
+    cd packages/mdopen && bun run build && bun link
 
 install-extension:
-    pi install /tmp/pi-open-message-in-browser/packages/pi-open-message-in-browser
+    pi install packages/pi-open-message-in-browser
 
 install-all:
     just install

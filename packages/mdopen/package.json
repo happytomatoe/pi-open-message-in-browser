@@ -32,6 +32,8 @@
     "markdown-it-sup": "^2.0.0",
     "markdown-it-task-lists": "^2.1.1",
     "marked": "^12.0.0",
+    "mdopen": "/tmp/pi-open-message-in-browser/packages/mdopen",
+    "mdopen": "/tmp/pi-open-message-in-browser/packages/mdopen",
     "mermaid": "^11.4.0",
     "prismjs": "^1.30.0",
     "remarkable": "^2.0.1",

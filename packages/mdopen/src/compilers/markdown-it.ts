@@ -27,7 +27,7 @@ const defaults: MarkdownItOptions = {
   typographer: false,
   xhtmlOut: false,
   langPrefix: 'language-',
-  plugins: [],
+  plugins: ['abbr', 'attrs', 'footnote', 'ins', 'mark', 'sub', 'sup', 'tasklists'],
 };
 
 const description: Record<string, string> = {

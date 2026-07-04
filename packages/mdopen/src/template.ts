@@ -142,6 +142,65 @@ export function generateHtmlDocument(
     /* Theme overrides */
     ${css}
 
+    /* TOC */
+    @media (prefers-color-scheme: light) {
+      body { --toc-delimiter: #e1e4e8; }
+    }
+    @media (prefers-color-scheme: dark) {
+      body { --toc-delimiter: #30363d; }
+    }
+    #_toc {
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      width: 299px;
+      height: 100%;
+      border-right: 1px solid var(--toc-delimiter);
+      overflow-y: auto;
+      overflow-x: hidden;
+      background-color: #fff;
+      font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+    ._theme-github-dark #_toc {
+      background-color: #0d1117;
+      color: #c9d1d9;
+    }
+    #_toc ._ul {
+      padding-left: 20px !important;
+      margin: 0 !important;
+      list-style: none;
+    }
+    #_toc > ._ul {
+      padding: 0 0 0 10px !important;
+    }
+    #_toc > ._ul:first-child {
+      padding-top: 15px !important;
+    }
+    #_toc > ._ul:last-child {
+      padding-bottom: 15px !important;
+    }
+    #_toc ._ul a {
+      border: 0 !important;
+      padding: 5px 10px !important;
+      display: block !important;
+      color: #0969da;
+      text-decoration: none;
+    }
+    #_toc ._ul a:hover {
+      text-decoration: underline;
+    }
+    ._theme-github-dark #_toc ._ul a {
+      color: #58a6ff;
+    }
+    ._color-light #_toc {
+      border-right: 1px solid #e1e4e8;
+    }
+    ._color-dark #_toc {
+      border-right: 1px solid #30363d;
+    }
+
     /* Anchor link styles */
     .markdown-body .octicon,
     .markdown-theme .octicon {
@@ -513,7 +572,7 @@ export function generateHtmlDocument(
       var stack = [{ level: 0, element: rootUl }];
       headings.forEach(heading => {
         var level = parseInt(heading.tagName.substring(1));
-        var text = heading.innerText;
+        var text = heading.textContent;
         var id = heading.id;
         while (stack.length > 1 && stack[stack.length - 1].level >= level) stack.pop();
         var parent = stack[stack.length - 1].element;
