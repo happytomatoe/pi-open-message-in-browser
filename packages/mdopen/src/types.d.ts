@@ -1,5 +1,6 @@
 declare module 'commonmark' {
   export class Parser {
+    constructor(options?: { smart?: boolean });
     parse(src: string): Node;
   }
   

@@ -5,10 +5,20 @@ import { convertMarkdownToHtml } from './converter';
 import { generateHtmlDocument } from './template';
 import { getAssets } from './assets';
 import { writeAndOpenHtml } from './browser';
+import { validateMermaid } from './mermaid-validator';
 import type { Theme } from './types';
 import type { CompilerName, CompilerOptions } from './compilers';
 
 const VALID_COMPILERS: CompilerName[] = ['markdown-it', 'marked', 'commonmark', 'remarkable'];
+
+const VALID_THEMES = [
+  'light', 'dark', 'auto', 'github', 'github-dark',
+  'almond', 'awsm', 'axist', 'bamboo', 'bullframe', 'holiday',
+  'kacit', 'latex', 'marx', 'mini', 'modest', 'new', 'no-class',
+  'pico', 'retro', 'sakura', 'sakura-vader', 'semantic', 'simple',
+  'style-sans', 'style-serif', 'stylize', 'superstylin', 'tacit',
+  'vanilla', 'water', 'water-dark', 'writ',
+];
 
 interface CliArgs {
     file?: string;
@@ -21,6 +31,7 @@ interface CliArgs {
     toc: boolean;
     math: boolean;
     emoji: boolean;
+    validateMermaid: boolean;
     width?: string;
 }
 
@@ -37,6 +48,7 @@ Options:
   --toc                                 Generate a Table of Contents sidebar
   --math                                Enable MathJax for LaTeX rendering
   --emoji                               Enable emoji rendering (:emoji:)
+  --no-validate-mermaid                 Skip mermaid diagram validation
   --width <width>                       Content width (auto, full, wide, large, medium, small, tiny)
   -o, --out <file.html>                Write HTML to this path instead of a temp file
   -b, --browser <command>              Command used to open the file (default: "open" on macOS, "xdg-open" elsewhere)
@@ -61,6 +73,7 @@ function parseArgs(argv: string[]): CliArgs {
         toc: false,
         math: false,
         emoji: false,
+        validateMermaid: true,
     };
 
     for (let i = 0; i < argv.length; i++) {
@@ -76,6 +89,9 @@ function parseArgs(argv: string[]): CliArgs {
                 const value = argv[++i];
                 if (!value) {
                     throw new Error('--theme requires a value');
+                }
+                if (!VALID_THEMES.includes(value)) {
+                    throw new Error(`--theme must be one of: ${VALID_THEMES.join(', ')}`);
                 }
                 args.theme = value as Theme;
                 break;
@@ -97,6 +113,9 @@ function parseArgs(argv: string[]): CliArgs {
                 break;
             case '--emoji':
                 args.emoji = true;
+                break;
+            case '--no-validate-mermaid':
+                args.validateMermaid = false;
                 break;
             case '--width': {
                 const value = argv[++i];
@@ -162,6 +181,25 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     const { html: htmlBody, metadata } = await convertMarkdownToHtml(markdown, args.theme, args.compiler, args.compilerOptions);
     const { css, js } = await getAssets(args.theme);
     const fullHtml = generateHtmlDocument(htmlBody, css, js, args.theme, args.toc, metadata, args.width, args.math, args.emoji);
+
+    // Validate mermaid diagrams if markdown contains them
+    if (args.validateMermaid && /```mermaid/.test(markdown)) {
+        const result = await validateMermaid(markdown);
+        if (result.total > 0) {
+            if (result.failed > 0) {
+                console.error(`Mermaid validation: ${result.failed}/${result.total} diagram(s) failed to render:`);
+                for (const err of result.errors) {
+                    console.error(`  #${err.index}: ${err.error}`);
+                    console.error(`    Source: ${err.source.substring(0, 80)}...`);
+                }
+                if (args.out) {
+                    process.exit(1);
+                }
+            } else {
+                console.log(`Mermaid validation: ${result.passed}/${result.total} diagram(s) OK`);
+            }
+        }
+    }
 
     const outputPath = args.out
         ? path.resolve(process.cwd(), args.out)

@@ -4,17 +4,18 @@ import type { Theme } from './types';
 
 const THEMES_DIR = path.resolve(__dirname, '../themes');
 
-function getThemeCssPath(theme: Theme): string {
+function getThemeCssPaths(theme: Theme): string[] {
     // Map legacy theme names
-    if (theme === 'light') return path.join(THEMES_DIR, 'github.css');
-    if (theme === 'dark') return path.join(THEMES_DIR, 'github-dark.css');
+    if (theme === 'light') return [path.join(THEMES_DIR, 'github.css')];
+    if (theme === 'dark') return [path.join(THEMES_DIR, 'github-dark.css')];
+    if (theme === 'auto') return [path.join(THEMES_DIR, 'github.css'), path.join(THEMES_DIR, 'github-dark.css')];
 
     const customPath = path.join(THEMES_DIR, `${theme}.css`);
     if (fs.existsSync(customPath)) {
-        return customPath;
+        return [customPath];
     }
 
-    return path.join(THEMES_DIR, 'github.css');
+    return [path.join(THEMES_DIR, 'github.css')];
 }
 
 function isDarkTheme(theme: Theme): boolean {
@@ -42,13 +43,13 @@ const PRISM_LANGUAGES = [
 
 export async function getAssets(theme: Theme = 'light'): Promise<{ css: string, js: string }> {
     try {
-        const cssPath = getThemeCssPath(theme);
+        const cssPaths = getThemeCssPaths(theme);
         const prismCssPath = prismCssForTheme(theme);
         const mermaidJsPath = require.resolve('mermaid/dist/mermaid.min.js');
         const prismJsPath = require.resolve('prismjs');
 
-        // CSS: theme + prism
-        let css = fs.readFileSync(cssPath, 'utf8');
+        // CSS: theme(s) + prism
+        let css = cssPaths.map(p => fs.readFileSync(p, 'utf8')).join('\n');
         css += '\n' + fs.readFileSync(prismCssPath, 'utf8');
 
         // JS: Prism core + common languages

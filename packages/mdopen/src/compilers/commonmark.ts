@@ -20,8 +20,8 @@ export const commonmarkCompiler: Compiler = {
   name: 'commonmark',
   compile: (markdown: string, options?: CommonmarkOptions) => {
     const opts = { ...defaults, ...options };
-    const reader = new commonmark.Parser();
-    const writer = new commonmark.HtmlRenderer(opts);
+    const reader = new commonmark.Parser({ smart: opts.smart });
+    const writer = new commonmark.HtmlRenderer({ safe: opts.safe });
     return writer.render(reader.parse(markdown));
   },
 };

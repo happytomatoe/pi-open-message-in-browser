@@ -1,4 +1,4 @@
-export type CompilerName = 'markdown-it' | 'marked' | 'remark' | 'commonmark' | 'showdown' | 'remarkable';
+export type CompilerName = 'markdown-it' | 'marked' | 'commonmark' | 'remarkable';
 
 export type CompilerOptions = {
   [key in CompilerName]?: any;

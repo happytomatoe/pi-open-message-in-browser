@@ -22,7 +22,7 @@ interface MarkdownItOptions {
 
 const defaults: MarkdownItOptions = {
   breaks: false,
-  html: true,
+  html: false,
   linkify: true,
   typographer: false,
   xhtmlOut: false,

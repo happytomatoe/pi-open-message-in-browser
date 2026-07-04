@@ -163,9 +163,16 @@ export function generateHtmlDocument(
       line-height: 1.5;
       word-wrap: break-word;
     }
-    ._theme-github-dark #_toc {
+    ._theme-github-dark #_toc,
+    ._color-dark #_toc {
       background-color: #0d1117;
       color: #c9d1d9;
+    }
+    @media (prefers-color-scheme: dark) {
+      ._color-auto #_toc {
+        background-color: #0d1117;
+        color: #c9d1d9;
+      }
     }
     #_toc ._ul {
       padding-left: 20px !important;
@@ -283,7 +290,7 @@ export function generateHtmlDocument(
       visibility: visible;
     }
     .markdown-theme .octicon-link {
-      color: var(--anchor, #24292f);
+      color: var(--anchor, currentColor);
     }
     .markdown-theme .anchor {
       border-bottom: 0;
@@ -439,13 +446,13 @@ export function generateHtmlDocument(
     ._theme-mini code { line-height: normal; }
     ._theme-tacit * { max-width: none; }
     ._theme-kacit * { max-width: none; }
-    ._theme-mini pre > code.mermaid { padding: 0; }
-    ._theme-superstylin pre > code.mermaid { background: none; padding: 0; margin: 0; border-radius: 0; }
-    ._theme-superstylin pre:has(> code.mermaid) { background: #f6f6f6; padding: 1rem; margin-bottom: 1.563rem; border-radius: 10px; }
-    ._theme-water pre > code.mermaid { padding: 0; background: none; border-radius: 0; }
-    ._theme-water pre:has(> code.mermaid) { padding: 10px; background: #efefef; border-radius: 6px; }
-    ._theme-water-dark pre > code.mermaid { padding: 0; background: none; border-radius: 0; }
-    ._theme-water-dark pre:has(> code.mermaid) { padding: 10px; background: #161f27; border-radius: 6px; }
+    ._theme-mini pre > div.mermaid { padding: 0; }
+    ._theme-superstylin pre > div.mermaid { background: none; padding: 0; margin: 0; border-radius: 0; }
+    ._theme-superstylin pre:has(> div.mermaid) { background: #f6f6f6; padding: 1rem; margin-bottom: 1.563rem; border-radius: 10px; }
+    ._theme-water pre > div.mermaid { padding: 0; background: none; border-radius: 0; }
+    ._theme-water pre:has(> div.mermaid) { padding: 10px; background: #efefef; border-radius: 6px; }
+    ._theme-water-dark pre > div.mermaid { padding: 0; background: none; border-radius: 0; }
+    ._theme-water-dark pre:has(> div.mermaid) { padding: 10px; background: #161f27; border-radius: 6px; }
 
     /* Prism init */
     code[class*=language-], pre[class*=language-] {
@@ -453,12 +460,12 @@ export function generateHtmlDocument(
     }
 
     /* Mermaid */
-    pre:has(> code.mermaid) {
+    pre:has(> div.mermaid) {
       resize: vertical;
       overflow: auto;
     }
-    .markdown-body code.mermaid,
-    .markdown-theme code.mermaid {
+    .markdown-body div.mermaid,
+    .markdown-theme div.mermaid {
       display: block;
       height: 100%;
     }
@@ -545,9 +552,9 @@ export function generateHtmlDocument(
 
     // Panzoom for mermaid
     if (typeof Panzoom !== 'undefined') {
-      var diagrams = Array.from(document.querySelectorAll('code.mermaid'));
+      var diagrams = Array.from(document.querySelectorAll('div.mermaid'));
       var pzTimeout = setInterval(() => {
-        var svg = Array.from(document.querySelectorAll('pre code.mermaid svg'));
+        var svg = Array.from(document.querySelectorAll('div.mermaid svg'));
         if (diagrams.length === svg.length) {
           clearInterval(pzTimeout);
           svg.forEach((diagram) => {
@@ -574,13 +581,24 @@ export function generateHtmlDocument(
         var level = parseInt(heading.tagName.substring(1));
         var text = heading.textContent;
         var id = heading.id;
+        // Generate id from text if compiler didn't provide one
+        if (!id) {
+          id = text.toLowerCase().replace(/[^\w\u4e00-\u9fff]+/g, '-').replace(/^-+|-+$/g, '') || 'heading';
+          heading.id = id;
+        }
         while (stack.length > 1 && stack[stack.length - 1].level >= level) stack.pop();
         var parent = stack[stack.length - 1].element;
         var currentUl = parent;
         if (parent.tagName !== 'UL') {
-          currentUl = document.createElement('ul');
-          currentUl.className = '_ul';
-          parent.appendChild(currentUl);
+          // Reuse existing ul if present, otherwise create new
+          var existingUl = parent.querySelector(':scope > ul._ul');
+          if (existingUl) {
+            currentUl = existingUl;
+          } else {
+            currentUl = document.createElement('ul');
+            currentUl.className = '_ul';
+            parent.appendChild(currentUl);
+          }
         }
         var li = document.createElement('li');
         var a = document.createElement('a');

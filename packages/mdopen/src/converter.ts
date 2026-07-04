@@ -5,36 +5,35 @@ import { type CompilerName, type CompilerOptions, getDefaultCompiler, getCompile
 
 /** Extracts YAML or TOML frontmatter from markdown. */
 function parseFrontmatter(markdown: string): { metadata: any, content: string } {
-    const regex = /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---\s*([\r\n]+|$)/;
-    const match = markdown.match(regex);
-    if (!match) {
-        return { metadata: {}, content: markdown };
-    }
-    
-    const frontmatter = match[1];
-    let metadata: any = {};
-    
-    try {
-        const yamlData = yaml.load(frontmatter);
-        if (yamlData && typeof yamlData === 'object' && !Array.isArray(yamlData)) {
-            metadata = yamlData;
-        } else {
-            throw new Error('Not a YAML object');
-        }
-    } catch (e) {
+    // Check for TOML frontmatter (+++ delimiters)
+    const tomlRegex = /^\+{3}\s*[\r\n]+([\s\S]*?)[\r\n]+\+{3}\s*([\r\n]+|$)/;
+    const tomlMatch = markdown.match(tomlRegex);
+    if (tomlMatch) {
         try {
-            const tomlData = toml.parse(frontmatter);
+            const tomlData = toml.parse(tomlMatch[1]);
             if (tomlData && typeof tomlData === 'object' && !Array.isArray(tomlData)) {
-                metadata = tomlData;
-            } else {
-                throw new Error('Not a TOML object');
+                return { metadata: tomlData, content: markdown.slice(tomlMatch[0].length) };
             }
-        } catch (e2) {
-            console.warn("Failed to parse frontmatter as YAML or TOML");
+        } catch (e) {
+            // Not valid TOML - leave content as-is
         }
     }
-    
-    return { metadata, content: markdown.slice(match[0].length) };
+
+    // Check for YAML frontmatter (--- delimiters)
+    const yamlRegex = /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---\s*([\r\n]+|$)/;
+    const yamlMatch = markdown.match(yamlRegex);
+    if (yamlMatch) {
+        try {
+            const yamlData = yaml.load(yamlMatch[1]);
+            if (yamlData && typeof yamlData === 'object' && !Array.isArray(yamlData)) {
+                return { metadata: yamlData, content: markdown.slice(yamlMatch[0].length) };
+            }
+        } catch (e) {
+            // Not valid YAML - leave content as-is
+        }
+    }
+
+    return { metadata: {}, content: markdown };
 }
 
 export async function convertMarkdownToHtml(

@@ -107,6 +107,7 @@ async function buildThemes() {
       }
     } catch (e) {
       console.error('Failed to process GitHub or Prism themes:', e);
+      process.exit(1);
     }
 
     console.log('Cleaning up...');
