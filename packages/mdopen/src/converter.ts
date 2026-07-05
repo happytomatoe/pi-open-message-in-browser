@@ -15,7 +15,8 @@ function parseFrontmatter(markdown: string): { metadata: any, content: string } 
                 return { metadata: tomlData, content: markdown.slice(tomlMatch[0].length) };
             }
         } catch (e) {
-            // Not valid TOML - leave content as-is
+            // Not valid TOML - still strip it to prevent rendering
+            return { metadata: {}, content: markdown.slice(tomlMatch[0].length) };
         }
     }
 
@@ -29,7 +30,8 @@ function parseFrontmatter(markdown: string): { metadata: any, content: string } 
                 return { metadata: yamlData, content: markdown.slice(yamlMatch[0].length) };
             }
         } catch (e) {
-            // Not valid YAML - leave content as-is
+            // Not valid YAML - still strip it to prevent rendering
+            return { metadata: {}, content: markdown.slice(yamlMatch[0].length) };
         }
     }
 

@@ -8,7 +8,7 @@ function getThemeCssPaths(theme: Theme): string[] {
     // Map legacy theme names
     if (theme === 'light') return [path.join(THEMES_DIR, 'github.css')];
     if (theme === 'dark') return [path.join(THEMES_DIR, 'github-dark.css')];
-    if (theme === 'auto') return [path.join(THEMES_DIR, 'github.css'), path.join(THEMES_DIR, 'github-dark.css')];
+    if (theme === 'auto') return [path.join(THEMES_DIR, 'github.css')];
 
     const customPath = path.join(THEMES_DIR, `${theme}.css`);
     if (fs.existsSync(customPath)) {

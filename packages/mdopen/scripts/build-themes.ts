@@ -51,6 +51,7 @@ async function buildThemes() {
     execSync(`git clone --depth 1 ${CLEANRMD_REPO} ${TEMP_DIR}`);
 
     console.log('Processing cleanrmd themes...');
+    let hadErrors = false;
     for (const [srcRelPath, destName] of Object.entries(THEME_MAPPING)) {
       const srcPath = path.join(TEMP_DIR, srcRelPath);
       const destPath = path.join(THEMES_DIR, destName);
@@ -62,6 +63,7 @@ async function buildThemes() {
         console.log(`Built ${destName}`);
       } else {
         console.warn(`Source not found for ${destName}: ${srcPath}`);
+        hadErrors = true;
       }
     }
 
@@ -113,6 +115,10 @@ async function buildThemes() {
     console.log('Cleaning up...');
     fs.rmSync(TEMP_DIR, { recursive: true, force: true });
     
+    if (hadErrors) {
+      console.error('Theme build completed with errors; some assets may be missing.');
+      process.exit(1);
+    }
     console.log('Successfully built all themes!');
   } catch (error) {
     console.error('Error building themes:', error);

@@ -5,7 +5,6 @@
     "": {
       "name": "pi-open-message-in-browser-monorepo",
       "dependencies": {
-        "js-yaml": "^5.2.1",
         "mdopen": "workspace:*",
         "panzoom": "^9.4.4",
       },

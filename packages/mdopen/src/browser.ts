@@ -33,9 +33,14 @@ export function writeAndOpenHtml(html: string, options: WriteAndOpenOptions): Pr
                 detached: true,
                 stdio: 'ignore',
             });
+
+            child.on('error', (err) => {
+                console.error(`Error spawning browser: ${err.message}`);
+            });
+
             child.unref();
             resolve({ filePath, opened: true });
-        } catch {
+        } catch (e) {
             resolve({ filePath, opened: false });
         }
     });

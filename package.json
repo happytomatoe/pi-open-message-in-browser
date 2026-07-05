@@ -12,7 +12,6 @@
     "url": "git+https://github.com/happytomatoe/pi-open-message-in-browser"
   },
   "dependencies": {
-    "js-yaml": "^5.2.1",
     "mdopen": "workspace:*",
     "panzoom": "^9.4.4"
   }

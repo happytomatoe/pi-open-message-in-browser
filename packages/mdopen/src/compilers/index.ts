@@ -14,7 +14,7 @@ import { markedCompiler } from './marked';
 import { commonmarkCompiler } from './commonmark';
 import { remarkableCompiler } from './remarkable';
 
-const COMPILERS: Record<string, Compiler> = {
+const COMPILERS: Record<CompilerName, Compiler> = {
   'markdown-it': markdownItCompiler,
   'marked': markedCompiler,
   'commonmark': commonmarkCompiler,
@@ -32,5 +32,9 @@ export function getDefaultCompiler(): CompilerName {
 }
 
 export function getCompiler(name: CompilerName): Compiler {
-  return COMPILERS[name] || COMPILERS['markdown-it'];
+  const compiler = COMPILERS[name];
+  if (!compiler) {
+    throw new Error(`Unsupported compiler: ${name}`);
+  }
+  return compiler;
 }
