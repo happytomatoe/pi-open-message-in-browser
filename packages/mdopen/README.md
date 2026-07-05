@@ -28,6 +28,12 @@ Options:
 | `-n, --no-open` | Convert only, don't open a browser | opens by default |
 | `-h, --help` | Show help | |
 
+### Environment Variables
+
+| Variable | Description | Default |
+| --- | --- | --- |
+| `MDOPEN_TIMING` | Set to `1` to show a detailed timing breakdown of the conversion process | `undefined` |
+
 Examples:
 
 ```bash

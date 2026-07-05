@@ -4,12 +4,16 @@
   "workspaces": [
     "packages/*"
   ],
-  "license": "MIT",
+  "scripts": {
+    "test:repro": "bun packages/pi-open-message-in-browser/test-repro.ts"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/happytomatoe/pi-open-message-in-browser"
   },
   "dependencies": {
+    "js-yaml": "^5.2.1",
+    "mdopen": "workspace:*",
     "panzoom": "^9.4.4"
   }
 }

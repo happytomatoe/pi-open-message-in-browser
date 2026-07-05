@@ -21,9 +21,11 @@
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
+    "@mermaid-js/parser": "^1.2.0",
     "commonmark": "^0.30.0",
     "github-markdown-css": "^5.8.0",
     "js-yaml": "^5.2.1",
+    "jsdom": "^29.1.1",
     "markdown-it": "^14.0.0",
     "markdown-it-abbr": "^2.0.0",
     "markdown-it-anchor": "^9.0.0",
@@ -41,6 +43,7 @@
     "toml": "^4.1.2"
   },
   "devDependencies": {
+    "@types/jsdom": "^28.0.3",
     "@types/markdown-it": "^14.0.0",
     "@types/node": "^26.1.0",
     "csso": "^5.0.5",
@@ -48,7 +51,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/happytomatoe/pi-open-message-in-browser",
+    "url": "https://github.com/happytomatoe/pi-open-message-in-browser",
     "directory": "packages/mdopen"
   },
   "license": "MIT"

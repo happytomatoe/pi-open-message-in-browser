@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { performance } from 'perf_hooks';
 import { convertMarkdownToHtml } from './converter';
 import { generateHtmlDocument } from './template';
 import { getAssets } from './assets';
@@ -54,6 +55,9 @@ Options:
   -b, --browser <command>              Command used to open the file (default: "open" on macOS, "xdg-open" elsewhere)
   -n, --no-open                        Only convert/write the HTML, do not open a browser
   -h, --help                           Show this help message
+
+  Environment Variables:
+    MDOPEN_TIMING=1                    Show a detailed timing breakdown of the conversion process
 
 Examples:
   mdopen README.md
@@ -171,32 +175,44 @@ function parseArgsOrExit(argv: string[]): CliArgs {
 export async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
     const args: CliArgs = parseArgsOrExit(argv);
 
+    const startTotal = performance.now();
+
     const inputPath = path.resolve(process.cwd(), args.file!);
     if (!fs.existsSync(inputPath)) {
         console.error(`Error: file not found: ${inputPath}`);
         process.exit(1);
     }
 
+    const startRead = performance.now();
     const markdown = fs.readFileSync(inputPath, 'utf8');
+    const endRead = performance.now();
+
+    const startConvert = performance.now();
     const { html: htmlBody, metadata } = await convertMarkdownToHtml(markdown, args.theme, args.compiler, args.compilerOptions);
+    const endConvert = performance.now();
+
+    const startAssets = performance.now();
     const { css, js } = await getAssets(args.theme);
+    const endAssets = performance.now();
+
+    const startTemplate = performance.now();
     const fullHtml = generateHtmlDocument(htmlBody, css, js, args.theme, args.toc, metadata, args.width, args.math, args.emoji);
+    const endTemplate = performance.now();
 
     // Validate mermaid diagrams if markdown contains them
+    let mermaidTime = 0;
     if (args.validateMermaid && /```mermaid/.test(markdown)) {
+        const startMermaid = performance.now();
         const result = await validateMermaid(markdown);
-        if (result.total > 0) {
-            if (result.failed > 0) {
-                console.error(`Mermaid validation: ${result.failed}/${result.total} diagram(s) failed to render:`);
-                for (const err of result.errors) {
-                    console.error(`  #${err.index}: ${err.error}`);
-                    console.error(`    Source: ${err.source.substring(0, 80)}...`);
-                }
-                if (args.out) {
-                    process.exit(1);
-                }
-            } else {
-                console.log(`Mermaid validation: ${result.passed}/${result.total} diagram(s) OK`);
+        mermaidTime = performance.now() - startMermaid;
+        if (result.total > 0 && result.failed > 0) {
+            console.error(`Mermaid validation: ${result.failed}/${result.total} diagram(s) failed to render:`);
+            for (const err of result.errors) {
+                console.error(`  #${err.index}: ${err.error}`);
+                console.error(`    Source: ${err.source.substring(0, 80)}...`);
+            }
+            if (args.out) {
+                process.exit(1);
             }
         }
     }
@@ -207,24 +223,48 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
 
     const sourceBaseName = path.basename(inputPath, path.extname(inputPath));
 
+    let writeTime = 0;
     if (!args.open) {
+        const startWrite = performance.now();
         const filePath = outputPath || path.join(os.tmpdir(), `${sourceBaseName}-${Math.random().toString(36).substring(2, 8)}.html`);
         fs.mkdirSync(path.dirname(filePath), { recursive: true });
         fs.writeFileSync(filePath, fullHtml, 'utf8');
+        writeTime = performance.now() - startWrite;
         console.log(filePath);
-        return;
+    } else {
+        const startWrite = performance.now();
+        const { filePath, opened } = await writeAndOpenHtml(fullHtml, {
+            browser: args.browser,
+            filePath: outputPath,
+            filenamePrefix: sourceBaseName,
+        });
+        writeTime = performance.now() - startWrite;
+
+        if (opened) {
+            console.log(`Opened in browser: ${filePath}`);
+        } else {
+            console.log(`Could not open browser automatically ("${args.browser}"). File saved to: ${filePath}`);
+        }
     }
 
-    const { filePath, opened } = await writeAndOpenHtml(fullHtml, {
-        browser: args.browser,
-        filePath: outputPath,
-        filenamePrefix: sourceBaseName,
-    });
+    const endTotal = performance.now();
 
-    if (opened) {
-        console.log(`Opened in browser: ${filePath}`);
-    } else {
-        console.log(`Could not open browser automatically ("${args.browser}"). File saved to: ${filePath}`);
+    if (process.env.MDOPEN_TIMING === '1') {
+        const timingData = [
+            { name: 'Read file', duration: endRead - startRead },
+            { name: 'Convert MD->HTML', duration: endConvert - startConvert },
+            { name: 'Get assets', duration: endAssets - startAssets },
+            { name: 'Template HTML', duration: endTemplate - startTemplate },
+            { name: 'Mermaid validate', duration: mermaidTime },
+            { name: 'Write/Open file', duration: writeTime },
+        ].sort((a, b) => b.duration - a.duration);
+
+        console.log('\n--- Conversion Timing Breakdown (Sorted) ---');
+        for (const item of timingData) {
+            console.log(`${item.name.padEnd(20)}: ${item.duration.toFixed(2)}ms`);
+        }
+        console.log(`--------------------------------------------`);
+        console.log(`Internal Total time: ${(endTotal - startTotal).toFixed(2)}ms\n`);
     }
 }
 

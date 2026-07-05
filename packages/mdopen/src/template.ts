@@ -124,10 +124,11 @@ export function generateHtmlDocument(
       width: auto !important;
       max-width: 100% !important;
       background-color: ${bgColor};
+      box-sizing: border-box;
     }
     ${autoBgStyle}
     body {
-      display: flex;
+      display: block;
     }
     details summary {
       cursor: pointer;
@@ -372,11 +373,12 @@ export function generateHtmlDocument(
     }
     ._theme-github .markdown-body {
       overflow: auto;
-      min-width: 830px;
+      width: 100%;
       max-width: 830px;
       padding: 32px;
       margin: 20px auto !important;
       border: 1px solid #e1e4e8;
+      box-sizing: border-box;
     }
     ._theme-github .markdown-body img {
       background-color: transparent;
@@ -386,11 +388,12 @@ export function generateHtmlDocument(
     }
     ._theme-github-dark .markdown-body {
       overflow: auto;
-      min-width: 830px;
+      width: 100%;
       max-width: 830px;
       padding: 32px;
       margin: 20px auto !important;
       border: 1px solid #30363d;
+      box-sizing: border-box;
     }
     ._theme-github-dark a {
       color: #4493f8 !important;
