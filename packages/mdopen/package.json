@@ -21,10 +21,10 @@
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
-    "@mermaid-js/parser": "^1.2.0",
+    "@mermaid-js/parser": "^1.1.1",
     "commonmark": "^0.30.0",
     "github-markdown-css": "^5.8.0",
-    "js-yaml": "^5.2.1",
+    "js-yaml": "^5.0.0",
     "markdown-it": "^14.0.0",
     "markdown-it-abbr": "^2.0.0",
     "markdown-it-anchor": "^9.0.0",
@@ -39,7 +39,7 @@
     "mermaid": "^11.4.0",
     "prismjs": "^1.30.0",
     "remarkable": "^2.0.1",
-    "toml": "^4.1.2"
+    "toml": "^4.1.1"
   },
   "devDependencies": {
     "@types/markdown-it": "^14.0.0",
