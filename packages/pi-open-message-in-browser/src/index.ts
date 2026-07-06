@@ -36,7 +36,7 @@ export default function openLastInBrowserExtension(pi: ExtensionAPI) {
 				ctx.ui.notify("Generating HTML...", "info");
 				const settings = loadSettings();
 				const { css, js } = await getAssets(settings.theme);
-				const htmlBody = await convertMarkdownToHtml(text);
+				const { html: htmlBody } = await convertMarkdownToHtml(text);
 				const fullHtml = generateHtmlDocument(htmlBody, css, js, settings.theme);
 				
 				const { filePath, opened } = await writeAndOpenHtml(fullHtml, {

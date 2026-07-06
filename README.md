@@ -1,28 +1,77 @@
-# pi-open-message-in-browser (monorepo)
+# pi-open-message-in-browser
 
-This repo is a bun workspaces monorepo with two packages:
+[Markdown preview extension](https://github.com/simov/markdown-viewer) repackaged as CLI and [Pi](https://github.com/earendil-works/pi) extension. Converts Markdown to GitHub-flavored HTML with syntax highlighting and Mermaid diagram support.
 
-- [`packages/mdopen`](packages/mdopen) — core Markdown → HTML conversion
-  (GitHub styling, highlight.js syntax highlighting, Mermaid diagrams), plus
-  the standalone `mdopen` CLI. Zero `pi` dependency; published to npm as
-  [`mdopen`](https://www.npmjs.com/package/mdopen).
-- [`packages/pi-open-message-in-browser`](packages/pi-open-message-in-browser) —
-  the `pi` extension that opens the last assistant response in a browser. Thin
-  wrapper around `mdopen`; published to npm as
-  [`pi-open-message-in-browser`](https://www.npmjs.com/package/pi-open-message-in-browser).
+## Prerequisites
+
+- [Bun](https://bun.sh) (required for CLI and development)
+- [Pi](https://github.com/earendil-works/pi) (required for the Pi extension)
 
 ## Install
 
-- As a `pi` extension: `pi install npm:pi-open-message-in-browser`
-- As a standalone CLI: `npm install -g mdopen`
+### As a Pi extension
 
-See each package's README for usage details.
+```bash
+just install-extension
+```
+
+### As a standalone CLI
+
+```bash
+just install
+```
+
+This adds the `mdopen` command to your PATH.
+
+## Usage
+
+### CLI
+
+```bash
+mdopen <file.md> [options]
+```
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-t, --theme <theme>` | Theme: `github`, `github-dark`, `auto`, or any bundled theme | `github` |
+| `-c, --compiler <compiler>` | Markdown compiler: `markdown-it`, `marked`, `commonmark`, `remarkable` | `markdown-it` |
+| `--toc` | Generate a Table of Contents sidebar | off |
+| `--math` | Enable MathJax for LaTeX rendering | off |
+| `--emoji` | Enable emoji rendering | off |
+| `--no-validate-mermaid` | Skip Mermaid diagram validation | on |
+| `--width <width>` | Content width: `auto`, `full`, `wide`, `large`, `medium`, `small`, `tiny` | `auto` |
+| `-o, --out <file.html>` | Write HTML to this path instead of a temp file | temp file |
+| `-b, --browser <command>` | Command used to open the file | `open` (macOS) / `xdg-open` (Linux) |
+| `-n, --no-open` | Convert only, don't open a browser | opens by default |
+| `-h, --help` | Show help | |
+
+Examples:
+
+```bash
+mdopen README.md                       # open with github theme
+mdopen notes.md --theme github-dark    # force dark theme
+mdopen notes.md --out notes.html -n    # just convert, don't open
+mdopen notes.md --toc --math           # with ToC and LaTeX support
+```
+
+### Pi extension
+
+Once installed, the extension adds a command to open the last assistant message in your browser:
+
+```
+/open-last-in-browser
+```
+
+The extension:
+- Extracts the last assistant response from the conversation
+- Converts Markdown to styled HTML with Mermaid support
+- Opens it in your default browser
 
 ## Development
 
 ```bash
 bun install               # link workspaces
-bun run --filter mdopen build
+bun run --filter mdopen build   # compile mdopen
 ```
 
 ## 📜 License
