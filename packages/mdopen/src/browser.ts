@@ -36,10 +36,13 @@ export function writeAndOpenHtml(html: string, options: WriteAndOpenOptions): Pr
 
             child.on('error', (err) => {
                 console.error(`Error spawning browser: ${err.message}`);
+                resolve({ filePath, opened: false });
             });
 
-            child.unref();
-            resolve({ filePath, opened: true });
+            child.on('spawn', () => {
+                child.unref();
+                resolve({ filePath, opened: true });
+            });
         } catch (e) {
             resolve({ filePath, opened: false });
         }

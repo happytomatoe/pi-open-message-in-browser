@@ -46,14 +46,18 @@ export async function validateMermaid(markdown: string): Promise<MermaidValidati
 
   // List of diagram types supported by @mermaid-js/parser
   const supportedTypes = new Set([
-    'architecture', 'cynefin', 'eventmodeling', 'gitgraph', 'info', 
-    'packet', 'pie', 'radar', 'railroad', 'treemap', 'treeview', 'wardley'
+    'architecture', 'block', 'classDiagram', 'cynefin', 'erDiagram',
+    'eventModeling', 'flowchart', 'gantt', 'gitGraph', 'info',
+    'journey', 'mindmap', 'packet', 'pie', 'quadrantChart',
+    'radar', 'railroad', 'requirement', 'sankey', 'sequence',
+    'stateDiagram', 'timeline', 'tree', 'treeView', 'treemap',
+    'wardley', 'xyChart'
   ]);
 
   for (let i = 0; i < blocks.length; i++) {
     const source = blocks[i];
     try {
-      const type = getDiagramType(source).toLowerCase();
+      const type = getDiagramType(source);
       
       if (!supportedTypes.has(type)) {
         // If the parser doesn't support this type, we skip validation 

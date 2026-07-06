@@ -1,4 +1,4 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 "use strict";
 
 require("../dist/cli.js").main();
