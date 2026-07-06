@@ -14,3 +14,15 @@ build:
 
 open file:
     node packages/mdopen/dist/cli.js '{{file}}'
+
+# Visual regression tests
+test-visual:
+    cd packages/mdopen && time npx playwright test tests/visual.spec.ts
+
+# Update visual regression baselines
+test-visual-update:
+    cd packages/mdopen && npx playwright test tests/visual.spec.ts --update-snapshots
+
+# Show visual regression test report
+test-visual-report:
+    cd packages/mdopen && npx playwright show-report tests/playwright-report
