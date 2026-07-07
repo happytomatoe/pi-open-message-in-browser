@@ -26,3 +26,5 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 *.gz
+playwright-report/
+test-results/

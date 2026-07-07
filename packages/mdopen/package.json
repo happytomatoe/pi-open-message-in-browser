@@ -19,7 +19,7 @@
     "build:themes": "bun run scripts/build-themes.ts",
     "test:visual": "bun run build:bin && playwright test tests/visual.spec.ts",
     "test:visual:update": "bun run build:bin && playwright test tests/visual.spec.ts --update-snapshots",
-    "test:visual:report": "playwright show-report tests/playwright-report",
+    "test:visual:report": "playwright show-report playwright-report",
     "prepublishOnly": "bun run build",
     "postinstall": "bun run build:bin"
   },

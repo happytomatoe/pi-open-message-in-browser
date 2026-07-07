@@ -28,4 +28,4 @@ test-visual-update:
 
 # Show visual regression test report
 test-visual-report:
-    cd packages/mdopen && npx playwright show-report tests/playwright-report
+    cd packages/mdopen && npx playwright show-report playwright-report

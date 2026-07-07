@@ -102,11 +102,10 @@ test.beforeAll(async () => {
   );
 
   for (const result of results) {
-    if (result.status === 'fulfilled') {
-      htmlFiles.set(result.value.theme, result.value.htmlPath);
-    } else {
-      console.error(`Failed to generate HTML:`, result.reason);
+    if (result.status === 'rejected') {
+      throw new Error(`Critical setup failure during HTML generation: ${result.reason}`);
     }
+    htmlFiles.set(result.value.theme, result.value.htmlPath);
   }
 });
 
@@ -122,12 +121,12 @@ test.describe('Visual Regression Tests', () => {
       const themeStartTime = Date.now();
 
       const navigationStart = Date.now();
-      await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' });
+      await page.goto(`file://${htmlPath}`, { waitUntil: 'domcontentloaded' });
       const navigationTime = Date.now() - navigationStart;
 
-      const loadStateStart = Date.now();
-      await page.waitForLoadState('networkidle');
-      const loadStateTime = Date.now() - loadStateStart;
+      // Wait for Mermaid SVG to be rendered and visible
+      await page.waitForSelector('.mermaid svg', { state: 'visible', timeout: 5000 });
+      const loadStateTime = Date.now() - navigationStart - navigationTime;
 
       const screenshotStart = Date.now();
       await expect(page).toHaveScreenshot(`${theme}.png`, {
