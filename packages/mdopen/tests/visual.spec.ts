@@ -6,7 +6,7 @@ import * as fs from 'fs';
 
 const execPromise = promisify(exec);
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const MDOPEN_CLI = path.join(PROJECT_ROOT, 'dist/cli.js');
+const MDOPEN_BIN = path.join(PROJECT_ROOT, 'bin', 'mdopen');
 const OUTPUT_DIR = '/tmp/mdopen-playwright-test';
 
 const THEMES = [
@@ -70,10 +70,15 @@ async function generateHtml(theme: string): Promise<string> {
   fs.writeFileSync(tmpFile, TEST_MARKDOWN, 'utf8');
 
   const startTime = Date.now();
-  await execPromise(`node "${MDOPEN_CLI}" "${tmpFile}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
+  const { stdout } = await execPromise(`MDOPEN_TIMING=1 "${MDOPEN_BIN}" "${tmpFile}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
     timeout: 30000,
   });
   const elapsed = Date.now() - startTime;
+
+  if (process.env.VISUAL_TEST_TIMING === '1') {
+    console.log(`\n[HTML Generation: ${theme}]`);
+    console.log(stdout);
+  }
 
   return htmlFile;
 }
