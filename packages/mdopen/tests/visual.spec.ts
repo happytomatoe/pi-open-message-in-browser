@@ -69,9 +69,11 @@ async function generateHtml(theme: string): Promise<string> {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   fs.writeFileSync(tmpFile, TEST_MARKDOWN, 'utf8');
 
+  const startTime = Date.now();
   await execPromise(`node "${MDOPEN_CLI}" "${tmpFile}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
     timeout: 30000,
   });
+  const elapsed = Date.now() - startTime;
 
   return htmlFile;
 }
@@ -82,7 +84,14 @@ const htmlFiles = new Map<string, string>();
 test.beforeAll(async () => {
   const results = await Promise.allSettled(
     THEMES.map(async (theme) => {
+      const startTime = Date.now();
       const htmlPath = await generateHtml(theme);
+      const elapsed = Date.now() - startTime;
+
+      if (process.env.VISUAL_TEST_TIMING === '1') {
+        console.log(`[HTML Generation] ${theme.padEnd(20)} ${elapsed}ms`);
+      }
+
       return { theme, htmlPath };
     })
   );
@@ -105,15 +114,32 @@ test.describe('Visual Regression Tests', () => {
         return;
       }
 
+      const themeStartTime = Date.now();
+
+      const navigationStart = Date.now();
       await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' });
+      const navigationTime = Date.now() - navigationStart;
 
-      // Wait for content to be stable (no layout shifts)
+      const loadStateStart = Date.now();
       await page.waitForLoadState('networkidle');
+      const loadStateTime = Date.now() - loadStateStart;
 
-      // Take screenshot and compare with baseline
+      const screenshotStart = Date.now();
       await expect(page).toHaveScreenshot(`${theme}.png`, {
         fullPage: true,
       });
+      const screenshotTime = Date.now() - screenshotStart;
+
+      const themeTime = Date.now() - themeStartTime;
+
+      if (process.env.VISUAL_TEST_TIMING === '1') {
+        console.log(`\n[Theme: ${theme}]`);
+        console.log(`  HTML Generation: ${htmlFiles.get(theme)?.length || 0} chars`);
+        console.log(`  Navigation:       ${navigationTime}ms`);
+        console.log(`  Load State:       ${loadStateTime}ms`);
+        console.log(`  Screenshot:       ${screenshotTime}ms`);
+        console.log(`  TOTAL:            ${themeTime}ms`);
+      }
     });
   }
 });
