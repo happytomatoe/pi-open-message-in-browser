@@ -28,7 +28,7 @@ function getDiagramType(block: string): string {
   
   // Map common aliases to what @mermaid-js/parser expects
   const aliases: Record<string, string> = {
-    // 'flowchart': 'graph',
+    'flowchart': 'graph',
   };
   
   return aliases[firstWord] || firstWord;
