@@ -15,7 +15,7 @@ build:
 build-bin:
     cd packages/mdopen && bun run build:bin
 
-open file:
+open file: build-bin
     ./packages/mdopen/bin/mdopen '{{file}}'
 
 # Visual regression tests
