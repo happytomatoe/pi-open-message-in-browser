@@ -5,7 +5,7 @@
   ],
   "workspaces": {
     ".": {
-      "ignore": ["packages/pi-open-message-in-browser/test-repro.ts"]
+      "ignore": ["packages/pi-open-message-in-browser/test-repro.ts"],
       "entry": ["packages/pi-open-message-in-browser/test-repro.ts"]
     }
   }
