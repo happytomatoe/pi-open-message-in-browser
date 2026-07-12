@@ -99,9 +99,13 @@ function mermaidPlugin(md: any) {
     const info = token.info.trim();
 
     if (info === 'mermaid') {
-      const content = token.content;
+      const content = token.content.trim();
       mermaidBlocks.push(content);
-      return `<div class="mermaid">${content}</div>`;
+      const escaped = content
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return `<div class="mermaid">${escaped}</div>`;
     }
 
     return defaultFence ? defaultFence(tokens, idx, options, env, slf) : '';

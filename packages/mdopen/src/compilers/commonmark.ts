@@ -1,5 +1,6 @@
 import * as commonmark from 'commonmark';
 import type { Compiler } from './index';
+import { extractMermaidBlocks } from './mermaid-utils';
 
 interface CommonmarkOptions {
   safe?: boolean;
@@ -24,12 +25,7 @@ export const commonmarkCompiler: Compiler = {
     const writer = new commonmark.HtmlRenderer({ safe: opts.safe });
     const html = writer.render(reader.parse(markdown));
 
-    const mermaidBlocks: string[] = [];
-    const regex = /```mermaid\s*\n([\s\S]*?)```/g;
-    let match;
-    while ((match = regex.exec(markdown)) !== null) {
-      mermaidBlocks.push(match[1].trim());
-    }
+    const mermaidBlocks = extractMermaidBlocks(markdown);
 
     return { html, mermaidBlocks };
   },

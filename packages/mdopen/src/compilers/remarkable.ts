@@ -1,5 +1,6 @@
 import { Remarkable } from 'remarkable';
 import type { Compiler } from './index';
+import { extractMermaidBlocks } from './mermaid-utils';
 
 interface RemarkableOptions {
   breaks?: boolean;
@@ -36,12 +37,7 @@ export const remarkableCompiler: Compiler = {
     const md = new Remarkable('full', opts);
     const html = md.render(markdown);
 
-    const mermaidBlocks: string[] = [];
-    const regex = /```mermaid\s*\n([\s\S]*?)```/g;
-    let match;
-    while ((match = regex.exec(markdown)) !== null) {
-      mermaidBlocks.push(match[1].trim());
-    }
+    const mermaidBlocks = extractMermaidBlocks(markdown);
 
     return { html, mermaidBlocks };
   },
