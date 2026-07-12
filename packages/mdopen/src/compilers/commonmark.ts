@@ -22,7 +22,16 @@ export const commonmarkCompiler: Compiler = {
     const opts = { ...defaults, ...options };
     const reader = new commonmark.Parser({ smart: opts.smart });
     const writer = new commonmark.HtmlRenderer({ safe: opts.safe });
-    return writer.render(reader.parse(markdown));
+    const html = writer.render(reader.parse(markdown));
+
+    const mermaidBlocks: string[] = [];
+    const regex = /```mermaid\s*\n([\s\S]*?)```/g;
+    let match;
+    while ((match = regex.exec(markdown)) !== null) {
+      mermaidBlocks.push(match[1].trim());
+    }
+
+    return { html, mermaidBlocks };
   },
 };
 

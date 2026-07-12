@@ -46,12 +46,21 @@ export const markedCompiler: Compiler = {
     };
 
     // Use per-call options to avoid mutating global state
-    return marked.parse(markdown, {
+    const html = marked.parse(markdown, {
       renderer,
       breaks: opts.breaks,
       gfm: opts.gfm,
       pedantic: opts.pedantic,
     }) as string;
+
+    const mermaidBlocks: string[] = [];
+    const regex = /```mermaid\s*\n([\s\S]*?)```/g;
+    let match;
+    while ((match = regex.exec(markdown)) !== null) {
+      mermaidBlocks.push(match[1].trim());
+    }
+
+    return { html, mermaidBlocks };
   },
 };
 

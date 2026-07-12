@@ -6,7 +6,7 @@ export type CompilerOptions = {
 
 export interface Compiler {
   name: CompilerName;
-  compile(markdown: string, options?: any): string;
+  compile(markdown: string, options?: any): { html: string; mermaidBlocks: string[] };
 }
 
 import { markdownItCompiler } from './markdown-it';

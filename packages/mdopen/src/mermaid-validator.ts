@@ -21,8 +21,8 @@ function extractMermaidBlocks(markdown: string): string[] {
 
 import { parse } from 'mermaid-parser-bundle';
 
-export async function validateMermaid(markdown: string): Promise<MermaidValidationResult> {
-  const blocks = extractMermaidBlocks(markdown);
+export async function validateMermaid(blocks: string[]): Promise<MermaidValidationResult> {
+  // Blocks are now passed directly
   if (blocks.length === 0) {
     return { total: 0, passed: 0, failed: 0, errors: [] };
   }

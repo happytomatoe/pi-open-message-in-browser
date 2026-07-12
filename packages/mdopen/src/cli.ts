@@ -188,7 +188,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     const endRead = performance.now();
 
     const startConvert = performance.now();
-    const { html: htmlBody, metadata } = await convertMarkdownToHtml(markdown, args.theme, args.compiler, args.compilerOptions);
+    const { html: htmlBody, metadata, mermaidBlocks } = await convertMarkdownToHtml(markdown, args.theme, args.compiler, args.compilerOptions);
     const endConvert = performance.now();
 
     const startAssets = performance.now();
@@ -203,7 +203,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     let mermaidTime = 0;
     if (args.validateMermaid && /```mermaid/.test(markdown)) {
         const startMermaid = performance.now();
-        const result = await validateMermaid(markdown);
+        const result = await validateMermaid(mermaidBlocks);
         mermaidTime = performance.now() - startMermaid;
         if (result.total > 0 && result.failed > 0) {
             console.error(`Mermaid validation: ${result.failed}/${result.total} diagram(s) failed to render:`);

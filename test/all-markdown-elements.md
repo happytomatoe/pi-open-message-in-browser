@@ -172,7 +172,7 @@ flowchart TD
     G --> C
     F -->|Yes| H[Deploy to Production]
     H --> I[Monitor & Alert]
-    I --> J[✅ Done]
+    I --> J["✅ Done"]
 ```
 
 And here's a **sequence diagram** for a login flow:
@@ -189,7 +189,7 @@ sequenceDiagram
     API->>DB: Verify user
     DB-->>API: User found
     API->>API: Generate JWT
-    API-->>UI: 200 { token, user }
+    API-->>UI: "200 { token, user }"
     UI-->>U: Redirect to dashboard
 ```
 

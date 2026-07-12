@@ -34,7 +34,16 @@ export const remarkableCompiler: Compiler = {
   compile: (markdown: string, options?: RemarkableOptions) => {
     const opts = { ...defaults, ...options };
     const md = new Remarkable('full', opts);
-    return md.render(markdown);
+    const html = md.render(markdown);
+
+    const mermaidBlocks: string[] = [];
+    const regex = /```mermaid\s*\n([\s\S]*?)```/g;
+    let match;
+    while ((match = regex.exec(markdown)) !== null) {
+      mermaidBlocks.push(match[1].trim());
+    }
+
+    return { html, mermaidBlocks };
   },
 };
 

@@ -64,8 +64,7 @@ function createCompiler(options: MarkdownItOptions = {}): MarkdownIt {
     xhtmlOut: opts.xhtmlOut,
     langPrefix: opts.langPrefix || 'language-',
   });
-
-  // Always use anchor plugin - use ariaHidden to generate the expected structure
+  
   md.use(anchor, {
     slugify,
     permalink: anchor.permalink.ariaHidden({
@@ -73,43 +72,54 @@ function createCompiler(options: MarkdownItOptions = {}): MarkdownIt {
       class: 'anchor',
     }),
   });
-
-  // Load optional plugins based on options
-  const plugins = opts.plugins || [];
   
-  if (plugins.includes('abbr')) {
-    md.use(abbr);
-  }
-  if (plugins.includes('attrs')) {
-    md.use(attrs);
-  }
-  if (plugins.includes('footnote')) {
-    md.use(footnote);
-  }
-  if (plugins.includes('ins')) {
-    md.use(ins);
-  }
-  if (plugins.includes('mark')) {
-    md.use(mark);
-  }
-  if (plugins.includes('sub')) {
-    md.use(sub);
-  }
-  if (plugins.includes('sup')) {
-    md.use(sup);
-  }
-  if (plugins.includes('tasklists')) {
-    md.use(taskLists);
-  }
-
+  const plugins = opts.plugins || [];
+  if (plugins.includes('abbr')) md.use(abbr);
+  if (plugins.includes('attrs')) md.use(attrs);
+  if (plugins.includes('footnote')) md.use(footnote);
+  if (plugins.includes('ins')) md.use(ins);
+  if (plugins.includes('mark')) md.use(mark);
+  if (plugins.includes('sub')) md.use(sub);
+  if (plugins.includes('sup')) md.use(sup);
+  if (plugins.includes('tasklists')) md.use(taskLists);
+  
   return md;
+}
+
+/**
+ * Markdown-it plugin to render Mermaid diagrams as <div> instead of <pre><code>
+ * and collect the source blocks for validation.
+ */
+function mermaidPlugin(md: any) {
+  const mermaidBlocks: string[] = [];
+  const defaultFence = md.renderer.rules.fence;
+
+  md.renderer.rules.fence = (tokens: any, idx: number, options: any, env: any, slf: any) => {
+    const token = tokens[idx];
+    const info = token.info.trim();
+
+    if (info === 'mermaid') {
+      const content = token.content;
+      mermaidBlocks.push(content);
+      return `<div class="mermaid">${content}</div>`;
+    }
+
+    return defaultFence ? defaultFence(tokens, idx, options, env, slf) : '';
+  };
+
+  (md as any)._mermaidBlocks = mermaidBlocks;
 }
 
 export const markdownItCompiler: Compiler = {
   name: 'markdown-it',
   compile: (markdown: string, options?: MarkdownItOptions) => {
     const md = createCompiler(options);
-    return md.render(markdown);
+    md.use(mermaidPlugin);
+    const html = md.render(markdown);
+    return {
+      html,
+      mermaidBlocks: (md as any)._mermaidBlocks || [],
+    };
   },
 };
 
