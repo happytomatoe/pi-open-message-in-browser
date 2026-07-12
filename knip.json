@@ -6,5 +6,6 @@
   "workspaces": {
     ".": {
       "ignore": ["packages/pi-open-message-in-browser/test-repro.ts"]
+    }
   }
 }
