@@ -124,8 +124,13 @@ test.describe('Visual Regression Tests', () => {
       await page.goto(`file://${htmlPath}`, { waitUntil: 'domcontentloaded' });
       const navigationTime = Date.now() - navigationStart;
 
-      // Wait for Mermaid SVG to be rendered and visible
-      await page.waitForSelector('.mermaid svg', { state: 'visible', timeout: 5000 });
+      // Wait for all Mermaid SVGs to be rendered and visible
+      const mermaidCount = await page.locator('.mermaid').count();
+      await page.waitForFunction(
+        (expected) => document.querySelectorAll('.mermaid svg').length >= expected,
+        mermaidCount,
+        { timeout: 10000 }
+      );
       const loadStateTime = Date.now() - navigationStart - navigationTime;
 
       const screenshotStart = Date.now();

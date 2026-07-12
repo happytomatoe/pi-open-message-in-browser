@@ -20,8 +20,7 @@
     "test:visual": "bun run build:bin && playwright test tests/visual.spec.ts",
     "test:visual:update": "bun run build:bin && playwright test tests/visual.spec.ts --update-snapshots",
     "test:visual:report": "playwright show-report playwright-report",
-    "prepublishOnly": "bun run build",
-    "postinstall": "bun run build:bin"
+    "prepublishOnly": "bun run build"
   },
   "dependencies": {
     "@mermaid-js/parser": "^1.1.1",
