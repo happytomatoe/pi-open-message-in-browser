@@ -7,15 +7,6 @@ export interface MermaidValidationResult {
   errors: { index: number; source: string; error: string }[];
 }
 
-function extractMermaidBlocks(markdown: string): string[] {
-  const blocks: string[] = [];
-  const regex = /```mermaid\s*\n([\s\S]*?)```/g;
-  let match;
-  while ((match = regex.exec(markdown)) !== null) {
-    blocks.push(match[1].trim());
-  }
-  return blocks;
-}
 
 // Removed getDiagramType as mermaid.parse detects it automatically
 

@@ -201,7 +201,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
 
     // Validate mermaid diagrams if markdown contains them
     let mermaidTime = 0;
-    if (args.validateMermaid && /```mermaid/.test(markdown)) {
+    if (args.validateMermaid && mermaidBlocks.length > 0) {
         const startMermaid = performance.now();
         const result = await validateMermaid(mermaidBlocks);
         mermaidTime = performance.now() - startMermaid;
