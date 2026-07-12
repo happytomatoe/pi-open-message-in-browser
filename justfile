@@ -12,5 +12,20 @@ install-all:
 build:
     cd packages/mdopen && bun run build
 
-open file:
-    node packages/mdopen/dist/cli.js '{{file}}'
+build-bin:
+    cd packages/mdopen && bun run build:bin
+
+open file: build-bin
+    ./packages/mdopen/bin/mdopen '{{file}}'
+
+# Visual regression tests
+test-visual:
+    cd packages/mdopen && bun run build:bin && time npx playwright test tests/visual.spec.ts
+
+# Update visual regression baselines
+test-visual-update:
+    cd packages/mdopen && bun run build:bin && npx playwright test tests/visual.spec.ts --update-snapshots
+
+# Show visual regression test report
+test-visual-report:
+    cd packages/mdopen && npx playwright show-report playwright-report

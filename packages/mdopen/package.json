@@ -15,9 +15,11 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "build:bin": "bun build ./src/cli.ts --compile --outfile bin/mdopen",
     "build:themes": "bun run scripts/build-themes.ts",
-    "test": "bun run scripts/visual-test.ts",
-    "test:update": "bun run scripts/visual-test.ts --update",
+    "test:visual": "bun run build:bin && playwright test tests/visual.spec.ts",
+    "test:visual:update": "bun run build:bin && playwright test tests/visual.spec.ts --update-snapshots",
+    "test:visual:report": "playwright show-report playwright-report",
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
@@ -45,7 +47,8 @@
     "@types/markdown-it": "^14.0.0",
     "@types/node": "^26.1.0",
     "csso": "^5.0.5",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "@playwright/test": "^1.48.0"
   },
   "repository": {
     "type": "git",
