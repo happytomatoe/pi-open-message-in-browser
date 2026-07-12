@@ -1,6 +1,6 @@
 import * as commonmark from 'commonmark';
 import type { Compiler } from './index';
-import { extractMermaidBlocks } from './mermaid-utils';
+import { extractMermaidBlocks, wrapMermaidDivs } from './mermaid-utils';
 
 interface CommonmarkOptions {
   safe?: boolean;
@@ -23,13 +23,12 @@ export const commonmarkCompiler: Compiler = {
     const opts = { ...defaults, ...options };
     const reader = new commonmark.Parser({ smart: opts.smart });
     const writer = new commonmark.HtmlRenderer({ safe: opts.safe });
-    let html = writer.render(reader.parse(markdown));
-    html = html.replace(/<pre><code class="language-mermaid">(.*?)<\/code><\/pre>/gs, 
-        '<div class="mermaid">$1</div>');
-
+    const html = writer.render(reader.parse(markdown));
     const mermaidBlocks = extractMermaidBlocks(markdown);
-
-    return { html, mermaidBlocks };
+    return { 
+      html: wrapMermaidDivs(html), 
+      mermaidBlocks 
+    };
   },
 };
 

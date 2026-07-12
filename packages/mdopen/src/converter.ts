@@ -52,8 +52,7 @@ export async function convertMarkdownToHtml(
     const options = compilerOptions?.[compilerName];
     
     // Compile markdown to HTML
-    const { html: rawHtml, mermaidBlocks } = compilerImpl.compile(content, options);
-    let html = rawHtml;
+    const { html, mermaidBlocks } = compilerImpl.compile(content, options);
     
     
     return { html, metadata, mermaidBlocks };

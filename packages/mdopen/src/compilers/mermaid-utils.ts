@@ -7,3 +7,8 @@ export function extractMermaidBlocks(markdown: string): string[] {
   }
   return blocks;
 }
+
+export function wrapMermaidDivs(html: string): string {
+  return html.replace(/<pre><code class="language-mermaid">([\s\S]*?)<\/code><\/pre>/gs, 
+    '<div class="mermaid">$1</div>');
+}
