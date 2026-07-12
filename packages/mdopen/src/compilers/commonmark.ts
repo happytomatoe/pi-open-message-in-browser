@@ -23,7 +23,9 @@ export const commonmarkCompiler: Compiler = {
     const opts = { ...defaults, ...options };
     const reader = new commonmark.Parser({ smart: opts.smart });
     const writer = new commonmark.HtmlRenderer({ safe: opts.safe });
-    const html = writer.render(reader.parse(markdown));
+    let html = writer.render(reader.parse(markdown));
+    html = html.replace(/<pre><code class="language-mermaid">(.*?)<\/code><\/pre>/gs, 
+        '<div class="mermaid">$1</div>');
 
     const mermaidBlocks = extractMermaidBlocks(markdown);
 

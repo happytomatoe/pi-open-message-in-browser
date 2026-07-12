@@ -45,6 +45,12 @@ export const markedCompiler: Compiler = {
       const id = getUniqueSlug(raw);
       return `<h${level} id="${id}"><a class="anchor" name="${id}" href="#${id}"><span class="octicon octicon-link"></span></a>${text}</h${level}>`;
     };
+    renderer.code = function(code, language, indented) {
+      if (language === 'mermaid') {
+        return `<div class="mermaid">${code}</div>`;
+      }
+      return `<pre><code class="${language ? 'language-' + language : ''}">${code}</code></pre>`;
+    };
 
     // Use per-call options to avoid mutating global state
     const html = marked.parse(markdown, {

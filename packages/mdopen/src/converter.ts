@@ -55,9 +55,6 @@ export async function convertMarkdownToHtml(
     const { html: rawHtml, mermaidBlocks } = compilerImpl.compile(content, options);
     let html = rawHtml;
     
-    // Post-process: add mermaid divs for code blocks with mermaid language
-    html = html.replace(/<pre><code class="language-mermaid">(.*?)<\/code><\/pre>/gs, 
-        '<div class="mermaid">$1</div>');
     
     return { html, metadata, mermaidBlocks };
 }

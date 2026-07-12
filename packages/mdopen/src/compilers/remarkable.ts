@@ -35,6 +35,12 @@ export const remarkableCompiler: Compiler = {
   compile: (markdown: string, options?: RemarkableOptions) => {
     const opts = { ...defaults, ...options };
     const md = new Remarkable('full', opts);
+    (md as any).renderer.code = function(code: string, lang: string, indented: boolean) {
+      if (lang === 'mermaid') {
+        return `<div class="mermaid">${code}</div>`;
+      }
+      return `<pre><code class="${lang ? 'language-' + lang : ''}">${code}</code></pre>`;
+    };
     const html = md.render(markdown);
 
     const mermaidBlocks = extractMermaidBlocks(markdown);
