@@ -49,4 +49,3 @@ export const remarkableCompiler: Compiler = {
   },
 };
 
-export { defaults, description };

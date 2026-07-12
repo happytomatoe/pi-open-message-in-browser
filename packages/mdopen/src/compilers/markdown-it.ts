@@ -127,4 +127,3 @@ export const markdownItCompiler: Compiler = {
   },
 };
 
-export { defaults, description };

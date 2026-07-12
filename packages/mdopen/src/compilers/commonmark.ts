@@ -32,4 +32,3 @@ export const commonmarkCompiler: Compiler = {
   },
 };
 
-export { defaults, description };

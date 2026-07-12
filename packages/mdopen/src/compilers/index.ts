@@ -23,9 +23,6 @@ const COMPILERS: Record<CompilerName, Compiler> = {
 
 let defaultCompiler: CompilerName = 'markdown-it';
 
-export function setDefaultCompiler(name: CompilerName): void {
-  defaultCompiler = name;
-}
 
 export function getDefaultCompiler(): CompilerName {
   return defaultCompiler;
