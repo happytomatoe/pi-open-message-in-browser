@@ -98,7 +98,7 @@ function mermaidPlugin(md: any) {
     const token = tokens[idx];
     const info = token.info.trim();
 
-    if (info === 'mermaid') {
+    if (info.split(/\s+/)[0] === 'mermaid') {
       const content = token.content.trim();
       mermaidBlocks.push(content);
       const escaped = content

@@ -47,9 +47,11 @@ export const markedCompiler: Compiler = {
     };
     renderer.code = function(code, language, indented) {
       if (language === 'mermaid') {
-        return `<div class="mermaid">${code}</div>`;
+        const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<div class="mermaid">${escaped}</div>`;
       }
-      return `<pre><code class="${language ? 'language-' + language : ''}">${code}</code></pre>`;
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<pre><code class="${language ? 'language-' + language : ''}">${escaped}</code></pre>`;
     };
 
     // Use per-call options to avoid mutating global state

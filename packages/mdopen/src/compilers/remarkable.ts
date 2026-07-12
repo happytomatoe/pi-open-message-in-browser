@@ -37,9 +37,11 @@ export const remarkableCompiler: Compiler = {
     const md = new Remarkable('full', opts);
     (md as any).renderer.code = function(code: string, lang: string, indented: boolean) {
       if (lang === 'mermaid') {
-        return `<div class="mermaid">${code}</div>`;
+        const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<div class="mermaid">${escaped}</div>`;
       }
-      return `<pre><code class="${lang ? 'language-' + lang : ''}">${code}</code></pre>`;
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<pre><code class="${lang ? 'language-' + lang : ''}">${escaped}</code></pre>`;
     };
     const html = md.render(markdown);
 
