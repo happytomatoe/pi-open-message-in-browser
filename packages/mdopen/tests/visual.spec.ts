@@ -120,9 +120,19 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
     htmlPath = await generateHtml('github');
   });
 
-  test('check panzoom global', async ({ page }) => {
+  test('panzoom available on SVG', async ({ page }) => {
     await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' });
-    const panzoomExists = await page.evaluate(() => typeof window.panzoom !== 'undefined');
+    await page.waitForFunction(
+      () => {
+        const svg = document.querySelector('.mermaid svg');
+        return svg && svg.__panzoom;
+      },
+      { timeout: 10000 }
+    );
+    const panzoomExists = await page.evaluate(() => {
+      const svg = document.querySelector('.mermaid svg');
+      return svg && svg.__panzoom !== undefined;
+    });
     expect(panzoomExists).toBe(true);
   });
 

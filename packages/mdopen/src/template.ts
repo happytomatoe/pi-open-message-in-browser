@@ -576,6 +576,14 @@ export function generateHtmlDocument(
       width: 16px;
       height: 16px;
     }
+    .mermaid:fullscreen {
+      background: #ffffff;
+      overflow: hidden;
+    }
+    ._color-dark .mermaid:fullscreen,
+    ._theme-github-dark .mermaid:fullscreen {
+      background: #0d1117;
+    }
     ._theme-github-dark .mermaid-panzoom-toolbar,
     ._color-dark .mermaid-panzoom-toolbar {
       background: rgba(0, 0, 0, 0.85);
@@ -623,6 +631,11 @@ export function generateHtmlDocument(
     var isDark = document.body.classList.contains('_color-dark') ||
       (document.body.classList.contains('_color-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
     var mermaidTheme = isDark ? 'dark' : 'default';
+      // Capture raw mermaid source before mermaid renders it away,
+      // so the "Open in Mermaid Live Editor" button can deep-link the diagram.
+      document.querySelectorAll('div.mermaid').forEach(function(el) {
+        el.__mermaidSrc = el.textContent;
+      });
     mermaid.initialize({startOnLoad: true, theme: mermaidTheme});
 
     // Panzoom for mermaid
@@ -649,6 +662,8 @@ export function generateHtmlDocument(
       const resetIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>';
       const zoomOutIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>';
       const zoomInIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>';
+      const fullscreenIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
+
 
       // Wait for mermaid to render, then add toolbars
       var toolDiagrams = Array.from(document.querySelectorAll('div.mermaid'));
@@ -669,9 +684,9 @@ export function generateHtmlDocument(
             var toolbar = document.createElement('div');
             toolbar.className = 'mermaid-panzoom-toolbar';
             toolbar.innerHTML =
-              '<button class="mermaid-panzoom-btn" aria-label="Reset zoom" title="Reset zoom (0)">' + resetIcon + '</button>' +
               '<button class="mermaid-panzoom-btn" aria-label="Zoom out" title="Zoom out (-)">' + zoomOutIcon + '</button>' +
-              '<button class="mermaid-panzoom-btn" aria-label="Zoom in" title="Zoom in (+)">' + zoomInIcon + '</button>';
+              '<button class="mermaid-panzoom-btn" aria-label="Zoom in" title="Zoom in (+)">' + zoomInIcon + '</button>' +
+              '<button class="mermaid-panzoom-btn" aria-label="Fullscreen" title="Fullscreen (f)">' + fullscreenIcon + '</button>';
             container.appendChild(toolbar);
 
             // Visual focus indicator (does not depend on panzoom)
@@ -691,21 +706,29 @@ export function generateHtmlDocument(
 
                 // Wire toolbar buttons
                 var buttons = toolbar.querySelectorAll('.mermaid-panzoom-btn');
-                // Reset button (index 0)
+                // Zoom Out button (index 0)
                 buttons[0].addEventListener('click', function(e) {
-                  e.stopPropagation();
-                  pz.moveTo(0, 0);
-                  pz.zoomAbs(0, 0, 1);
-                });
-                // Zoom Out button (index 1)
-                buttons[1].addEventListener('click', function(e) {
                   e.stopPropagation();
                   pz.smoothZoom(svg.clientWidth / 2, svg.clientHeight / 2, 1/1.2);
                 });
-                // Zoom In button (index 2)
-                buttons[2].addEventListener('click', function(e) {
+                // Zoom In button (index 1)
+                buttons[1].addEventListener('click', function(e) {
                   e.stopPropagation();
                   pz.smoothZoom(svg.clientWidth / 2, svg.clientHeight / 2, 1.2);
+                });
+                // Fullscreen button (index 2)
+                buttons[2].addEventListener('click', function(e) {
+                  e.stopPropagation();
+                  if (!document.fullscreenElement) {
+                    container.requestFullscreen().catch(function() {});
+                  } else {
+                    document.exitFullscreen().catch(function() {});
+                  }
+                });
+                document.addEventListener('fullscreenchange', function() {
+                  var active = document.fullscreenElement === container;
+                  buttons[2].setAttribute('aria-label', active ? 'Exit fullscreen' : 'Fullscreen');
+                  buttons[2].setAttribute('title', active ? 'Exit fullscreen (f)' : 'Fullscreen (f)');
                 });
 
                 // Keyboard navigation
@@ -745,6 +768,15 @@ export function generateHtmlDocument(
                       e.preventDefault();
                       pz.moveTo(0, 0);
                       pz.zoomAbs(0, 0, 1);
+                      break;
+                    case 'f':
+                    case 'F':
+                      e.preventDefault();
+                      if (!document.fullscreenElement) {
+                        container.requestFullscreen().catch(function() {});
+                      } else {
+                        document.exitFullscreen().catch(function() {});
+                      }
                       break;
                   }
                 });
