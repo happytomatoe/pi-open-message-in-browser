@@ -631,11 +631,6 @@ export function generateHtmlDocument(
     var isDark = document.body.classList.contains('_color-dark') ||
       (document.body.classList.contains('_color-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
     var mermaidTheme = isDark ? 'dark' : 'default';
-      // Capture raw mermaid source before mermaid renders it away,
-      // so the "Open in Mermaid Live Editor" button can deep-link the diagram.
-      document.querySelectorAll('div.mermaid').forEach(function(el) {
-        el.__mermaidSrc = el.textContent;
-      });
     mermaid.initialize({startOnLoad: true, theme: mermaidTheme});
 
     // Panzoom for mermaid
@@ -646,12 +641,8 @@ export function generateHtmlDocument(
         if (diagrams.length === svg.length) {
           clearInterval(pzTimeout);
           svg.forEach((diagram) => {
-            var pz = panzoom(diagram, {canvas: true});
+            var pz = panzoom(diagram, { canvas: true, filterKey: function() { return true; } });
             diagram.__panzoom = pz;
-            diagram.parentElement.parentElement.addEventListener('wheel', (e) => {
-              if (!e.shiftKey) return;
-              pz.zoomWithWheel(e);
-            });
           });
         }
       }, 50);
@@ -671,6 +662,18 @@ export function generateHtmlDocument(
         var toolSvg = Array.from(document.querySelectorAll('div.mermaid svg'));
         if (toolDiagrams.length === toolSvg.length) {
           clearInterval(toolTimeout);
+          // Keep every fullscreen button's label in sync (registered once, not per diagram)
+          document.addEventListener('fullscreenchange', function() {
+            var active = document.fullscreenElement;
+            document.querySelectorAll('.mermaid').forEach(function(c) {
+              var btn = c.querySelector('.mermaid-panzoom-btn[aria-label="Fullscreen"], .mermaid-panzoom-btn[aria-label="Exit fullscreen"]');
+              if (btn) {
+                var on = active === c;
+                btn.setAttribute('aria-label', on ? 'Exit fullscreen' : 'Fullscreen');
+                btn.setAttribute('title', on ? 'Exit fullscreen (f)' : 'Fullscreen (f)');
+              }
+            });
+          });
           toolDiagrams.forEach(function(container) {
             var svg = container.querySelector('svg');
             if (!svg) return;
@@ -719,16 +722,11 @@ export function generateHtmlDocument(
                 // Fullscreen button (index 2)
                 buttons[2].addEventListener('click', function(e) {
                   e.stopPropagation();
-                  if (!document.fullscreenElement) {
-                    container.requestFullscreen().catch(function() {});
-                  } else {
+                  if (document.fullscreenElement === container) {
                     document.exitFullscreen().catch(function() {});
+                  } else if (!document.fullscreenElement) {
+                    container.requestFullscreen().catch(function() {});
                   }
-                });
-                document.addEventListener('fullscreenchange', function() {
-                  var active = document.fullscreenElement === container;
-                  buttons[2].setAttribute('aria-label', active ? 'Exit fullscreen' : 'Fullscreen');
-                  buttons[2].setAttribute('title', active ? 'Exit fullscreen (f)' : 'Fullscreen (f)');
                 });
 
                 // Keyboard navigation
