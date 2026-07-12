@@ -471,6 +471,13 @@ export function generateHtmlDocument(
     .markdown-theme div.mermaid {
       display: block;
       height: 100%;
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .markdown-body div.mermaid:active,
+    .markdown-theme div.mermaid:active {
+      cursor: grabbing;
     }
     svg[id^=mermaid] text {
       stroke: none !important;
@@ -667,6 +674,15 @@ export function generateHtmlDocument(
               '<button class="mermaid-panzoom-btn" aria-label="Zoom in" title="Zoom in (+)">' + zoomInIcon + '</button>';
             container.appendChild(toolbar);
 
+            // Visual focus indicator (does not depend on panzoom)
+            container.addEventListener('focus', function() {
+              container.style.outline = '2px solid #58a6ff';
+              container.style.outlineOffset = '2px';
+            });
+            container.addEventListener('blur', function() {
+              container.style.outline = 'none';
+            });
+
             // Wait for panzoom to be initialized on this SVG
             var pzCheck = setInterval(function() {
               var pz = svg.__panzoom;
@@ -733,14 +749,6 @@ export function generateHtmlDocument(
                   }
                 });
 
-                // Visual focus indicator
-                container.addEventListener('focus', function() {
-                  container.style.outline = '2px solid #58a6ff';
-                  container.style.outlineOffset = '2px';
-                });
-                container.addEventListener('blur', function() {
-                  container.style.outline = 'none';
-                });
               }
             }, 50);
           });

@@ -208,6 +208,8 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
     const outline = await mermaidContainer.evaluate((el) => {
       return (el as HTMLElement).style.outline;
     });
-    expect(outline).toContain('solid 2px');
+    // Outline shorthand serialization order is browser-dependent ('2px solid rgb(...)')
+    expect(outline).toContain('solid');
+    expect(outline).toContain('2px');
   });
 });
