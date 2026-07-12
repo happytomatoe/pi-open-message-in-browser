@@ -5,7 +5,8 @@
     "packages/*"
   ],
   "scripts": {
-    "test:repro": "bun packages/pi-open-message-in-browser/test-repro.ts"
+    "test:repro": "bun packages/pi-open-message-in-browser/test-repro.ts",
+    "prepare": "husky"
   },
   "license": "MIT",
   "repository": {
@@ -14,5 +15,8 @@
   },
   "dependencies": {
     "panzoom": "^9.4.4"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }
