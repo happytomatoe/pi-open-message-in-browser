@@ -1,7 +1,5 @@
 # pi-open-message-in-browser
 
-
-
 [Markdown preview extension](https://github.com/simov/markdown-viewer) repackaged as CLI and [Pi](https://github.com/earendil-works/pi) extension. Converts Markdown to GitHub-flavored HTML with syntax highlighting and Mermaid diagram support.
 
 ## Prerequisites
