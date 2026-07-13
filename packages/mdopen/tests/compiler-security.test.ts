@@ -1,9 +1,11 @@
 import { expect, test, describe } from 'bun:test';
+import { markdownItCompiler } from '../src/compilers/markdown-it';
 import { commonmarkCompiler } from '../src/compilers/commonmark';
 import { markedCompiler } from '../src/compilers/marked';
 import { remarkableCompiler } from '../src/compilers/remarkable';
 
 const COMPILERS = [
+  { name: 'markdown-it', impl: markdownItCompiler },
   { name: 'commonmark', impl: commonmarkCompiler },
   { name: 'marked', impl: markedCompiler },
   { name: 'remarkable', impl: remarkableCompiler },

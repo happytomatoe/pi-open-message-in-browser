@@ -58,7 +58,7 @@ classDiagram
     }
     class Fish{
         +int scaleCount
-        +floatC()
+        +float()
         +swim()
     }
 ```
