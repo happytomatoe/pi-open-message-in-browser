@@ -43,7 +43,7 @@ export async function convertMarkdownToHtml(
     theme: Theme = 'light',
     compiler?: CompilerName,
     compilerOptions?: CompilerOptions
-): Promise<{ html: string, metadata: any }> {
+): Promise<{ html: string, metadata: any, mermaidBlocks: string[] }> {
     const { metadata, content } = parseFrontmatter(markdown);
     const compilerName = compiler || getDefaultCompiler();
     const compilerImpl = getCompiler(compilerName);
@@ -52,11 +52,8 @@ export async function convertMarkdownToHtml(
     const options = compilerOptions?.[compilerName];
     
     // Compile markdown to HTML
-    let html = compilerImpl.compile(content, options);
+    const { html, mermaidBlocks } = compilerImpl.compile(content, options);
     
-    // Post-process: add mermaid divs for code blocks with mermaid language
-    html = html.replace(/<pre><code class="language-mermaid">(.*?)<\/code><\/pre>/gs, 
-        '<div class="mermaid">$1</div>');
     
-    return { html, metadata };
+    return { html, metadata, mermaidBlocks };
 }

@@ -1,5 +1,6 @@
 import { marked } from 'marked';
 import type { Compiler } from './index';
+import { extractMermaidBlocks } from './mermaid-utils';
 
 interface MarkedCompilerOptions {
   breaks?: boolean;
@@ -44,15 +45,26 @@ export const markedCompiler: Compiler = {
       const id = getUniqueSlug(raw);
       return `<h${level} id="${id}"><a class="anchor" name="${id}" href="#${id}"><span class="octicon octicon-link"></span></a>${text}</h${level}>`;
     };
+    renderer.code = function(code, language, indented) {
+      if (language === 'mermaid') {
+        const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return `<div class="mermaid">${escaped}</div>`;
+      }
+      const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      return `<pre><code class="${language ? 'language-' + language : ''}">${escaped}</code></pre>`;
+    };
 
     // Use per-call options to avoid mutating global state
-    return marked.parse(markdown, {
+    const html = marked.parse(markdown, {
       renderer,
       breaks: opts.breaks,
       gfm: opts.gfm,
       pedantic: opts.pedantic,
     }) as string;
+
+    const mermaidBlocks = extractMermaidBlocks(markdown);
+
+    return { html, mermaidBlocks };
   },
 };
 
-export { defaults, description };

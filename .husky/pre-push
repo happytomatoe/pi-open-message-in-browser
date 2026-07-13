@@ -1,2 +1,4 @@
 echo "Running e2e visual regression tests..."
-cd packages/mdopen && bun run test:visual
+echo "Running knip..."
+bun run knip
+cd packages/mdopen && bun run cpd && bun run test:visual
