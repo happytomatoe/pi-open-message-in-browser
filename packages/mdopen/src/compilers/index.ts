@@ -6,7 +6,7 @@ export type CompilerOptions = {
 
 export interface Compiler {
   name: CompilerName;
-  compile(markdown: string, options?: any): string;
+  compile(markdown: string, options?: any): { html: string; mermaidBlocks: string[] };
 }
 
 import { markdownItCompiler } from './markdown-it';
@@ -23,9 +23,6 @@ const COMPILERS: Record<CompilerName, Compiler> = {
 
 let defaultCompiler: CompilerName = 'markdown-it';
 
-export function setDefaultCompiler(name: CompilerName): void {
-  defaultCompiler = name;
-}
 
 export function getDefaultCompiler(): CompilerName {
   return defaultCompiler;
