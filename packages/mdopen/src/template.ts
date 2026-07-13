@@ -650,7 +650,6 @@ export function generateHtmlDocument(
 
       // Mermaid Pan/Zoom Toolbar & Keyboard Navigation
 
-      const resetIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><polyline points="23 20 23 14 17 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>';
       const zoomOutIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>';
       const zoomInIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>';
       const fullscreenIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>';
@@ -683,7 +682,7 @@ export function generateHtmlDocument(
             container.setAttribute('role', 'region');
             container.setAttribute('aria-label', 'Mermaid diagram with pan and zoom controls');
 
-            // Create toolbar (GitHub/mermaid-live-editor order: Reset, Zoom Out, Zoom In)
+            // Toolbar order: Zoom Out, Zoom In, Fullscreen
             var toolbar = document.createElement('div');
             toolbar.className = 'mermaid-panzoom-toolbar';
             toolbar.innerHTML =
@@ -761,11 +760,6 @@ export function generateHtmlDocument(
                     case '_':
                       e.preventDefault();
                       pz.smoothZoom(svg.clientWidth / 2, svg.clientHeight / 2, 1/1.2);
-                      break;
-                    case '0':
-                      e.preventDefault();
-                      pz.moveTo(0, 0);
-                      pz.zoomAbs(0, 0, 1);
                       break;
                     case 'f':
                     case 'F':

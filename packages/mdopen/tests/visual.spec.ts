@@ -153,6 +153,9 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
 
     const buttons = toolbar.locator('.mermaid-panzoom-btn');
     await expect(buttons).toHaveCount(3);
+    await expect(buttons.nth(0)).toHaveAttribute('aria-label', 'Zoom out');
+    await expect(buttons.nth(1)).toHaveAttribute('aria-label', 'Zoom in');
+    await expect(buttons.nth(2)).toHaveAttribute('aria-label', 'Fullscreen');
   });
 
   test('keyboard shortcuts work', async ({ page }) => {
@@ -193,12 +196,6 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
     const afterZoomOut = await getTransform();
     expect(afterZoomOut.scale).toBeLessThan(afterZoomIn.scale);
 
-    await page.keyboard.press('0');
-    await page.waitForTimeout(500);
-    const afterReset = await getTransform();
-    expect(afterReset.x).toBeCloseTo(0, 0);
-    expect(afterReset.y).toBeCloseTo(0, 0);
-    expect(afterReset.scale).toBeCloseTo(initialTransform.scale, 1);
   });
 
   test('focus outline appears on click', async ({ page }) => {
