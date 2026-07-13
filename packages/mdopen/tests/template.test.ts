@@ -16,9 +16,11 @@ function render(): string {
 describe('mermaid pan/zoom template', () => {
   const html = render();
 
-  it('inlines the panzoom library', () => {
-    expect(html).toContain('createPanZoom');
-    expect(html).toContain('window.panzoom');
+  it('references panzoom for mermaid diagrams', () => {
+    // Panzoom is now loaded from assets.ts, not inlined
+    // Template should check for panzoom availability and use it
+    expect(html).toContain('typeof panzoom');
+    expect(html).toContain('panzoom(diagram');
   });
 
   it('injects the pan/zoom toolbar', () => {
@@ -27,9 +29,10 @@ describe('mermaid pan/zoom template', () => {
   });
 
   it('orders toolbar buttons Zoom Out, Zoom In, Fullscreen', () => {
-    const zoomOut = html.indexOf('aria-label="Zoom out"');
-    const zoomIn = html.indexOf('aria-label="Zoom in"');
-    const fullscreen = html.indexOf('aria-label="Fullscreen"');
+    // Use class+aria-label to match only the button elements, not querySelector strings
+    const zoomOut = html.indexOf('class="mermaid-panzoom-btn" aria-label="Zoom out"');
+    const zoomIn = html.indexOf('class="mermaid-panzoom-btn" aria-label="Zoom in"');
+    const fullscreen = html.indexOf('class="mermaid-panzoom-btn" aria-label="Fullscreen"');
     expect(zoomOut).toBeGreaterThan(-1);
     expect(zoomIn).toBeGreaterThan(-1);
     expect(fullscreen).toBeGreaterThan(-1);

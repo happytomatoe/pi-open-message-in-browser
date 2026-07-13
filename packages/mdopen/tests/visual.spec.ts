@@ -171,6 +171,7 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
 
     const mermaidContainer = page.locator('.mermaid').first();
     await mermaidContainer.click();
+    await page.waitForTimeout(100); // Ensure keyboard listener is ready
 
     const getTransform = async () => {
       return await page.evaluate(() => {
