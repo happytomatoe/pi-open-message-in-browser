@@ -21,14 +21,14 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Install deps and run visual tests
+        shell: bash
+        run: |
           apt-get update -qq && apt-get install -y -qq unzip curl > /dev/null 2>&1
           curl -fsSL https://bun.sh/install | bash
-          export BUN_INSTALL=/root/.bun
-          export PATH=$BUN_INSTALL/bin:$PATH
-          bun install
-          cd packages/mdopen && bun run build:bin
-          bun run test:visual
+          /root/.bun/bin/bun install
+          cd packages/mdopen && /root/.bun/bin/bun run build:bin
+          /root/.bun/bin/bun run test:visual
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -42,14 +42,14 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - name: Install deps and run gallery tests
+        shell: bash
+        run: |
           apt-get update -qq && apt-get install -y -qq unzip curl > /dev/null 2>&1
           curl -fsSL https://bun.sh/install | bash
-          export BUN_INSTALL=/root/.bun
-          export PATH=$BUN_INSTALL/bin:$PATH
-          bun install
-          cd packages/mdopen && bun run build:bin
-          bunx playwright test tests/mermaid-gallery.spec.ts
+          /root/.bun/bin/bun install
+          cd packages/mdopen && /root/.bun/bin/bun run build:bin
+          /root/.bun/bin/bunx playwright test tests/mermaid-gallery.spec.ts
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
