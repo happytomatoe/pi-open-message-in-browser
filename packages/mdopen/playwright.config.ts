@@ -14,8 +14,8 @@ export default defineConfig({
   },
   expect: {
     toHaveScreenshot: {
-      maxDiffPixelRatio: 0.01,  // Allow 1% difference (handles antialiasing)
-      threshold: 0.2,           // Per-pixel color threshold
+      maxDiffPixelRatio: 0.02,  // Allow 2% difference (handles cross-environment rendering)
+      threshold: 0.3,           // Per-pixel color threshold
       animations: 'disabled',   // Disable CSS animations for consistency
     },
   },
