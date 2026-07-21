@@ -617,18 +617,21 @@ export function generateHtmlDocument(
       }
     })();
 
-    // Prism highlighting
+    // Mermaid
+    ${js}
+    
+    // Prism highlighting (must be after JS assets are loaded)
     if (typeof Prism !== 'undefined') {
       Prism.highlightAll();
     }
-
-    // Mermaid
-    ${js}
-
+    
+    // Auto theme color detection
     var isDark = document.body.classList.contains('_color-dark') ||
       (document.body.classList.contains('_color-auto') && window.matchMedia('(prefers-color-scheme: dark)').matches);
     var mermaidTheme = isDark ? 'dark' : 'default';
     mermaid.initialize({startOnLoad: true, theme: mermaidTheme});
+
+    // Panzoom for mermaid
 
     // Panzoom for mermaid
     if (typeof panzoom !== 'undefined') {
