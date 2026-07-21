@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     container: fedora:latest
     steps:
+      - name: Install system dependencies
+        run: dnf install -y unzip git
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
@@ -20,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     container: fedora:latest
     steps:
+      - name: Install system dependencies
+        run: dnf install -y unzip git
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
@@ -37,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     container: fedora:latest
     steps:
+      - name: Install system dependencies
+        run: dnf install -y unzip git
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
