@@ -20,21 +20,12 @@ const htmlFiles = new Map<string, string>();
 test.beforeAll(async () => {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-  const results = await Promise.allSettled(
-    THEMES.map(async (theme) => {
-      const htmlFile = path.join(OUTPUT_DIR, `gallery-${theme}.html`);
-      await execPromise(`"${MDOPEN_BIN}" "${GALLERY_MD}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
-        timeout: 30000,
-      });
-      return { theme, htmlFile };
-    })
-  );
-
-  for (const result of results) {
-    if (result.status === 'rejected') {
-      throw new Error(`Critical setup failure during HTML generation: ${result.reason}`);
-    }
-    htmlFiles.set(result.value.theme, result.value.htmlFile);
+  for (const theme of THEMES) {
+    const htmlFile = path.join(OUTPUT_DIR, `gallery-${theme}.html`);
+    await execPromise(`"${MDOPEN_BIN}" "${GALLERY_MD}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
+      timeout: 30000,
+    });
+    htmlFiles.set(theme, htmlFile);
   }
 });
 
