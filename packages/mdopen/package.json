@@ -2,7 +2,7 @@
   "name": "mdopen",
   "version": "0.1.0",
   "description": "Convert Markdown to GitHub-styled HTML (with syntax highlighting and Mermaid support) and open it in a browser",
-  "keywords": ["markdown", "html", "mermaid", "shiki", "cli"],
+  "keywords": ["markdown", "html", "mermaid", "prism", "cli"],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {

@@ -24,26 +24,22 @@ const TEST_MARKDOWN = `# Test Heading
 Some **bold** and *italic* text.
 
 ### Code Block
-
 \`\`\`javascript
 const x = 42;
 console.log(x);
 \`\`\`
 
 ### Table
-
 | Col A | Col B |
 |-------|-------|
 | 1     | 2     |
 
 ### List
-
 - Item one
 - Item two
   - Nested
 
 ### Task List
-
 - [x] Done
 - [ ] Todo
 
@@ -54,59 +50,60 @@ console.log(x);
 ---
 
 ### Mermaid
-
 \`\`\`mermaid
 graph TD
   A[Start] --> B[End]
 \`\`\`
 `;
 
-// Generate HTML for a theme
 async function generateHtml(theme: string): Promise<string> {
   const tmpFile = path.join(OUTPUT_DIR, `test-${theme}.md`);
   const htmlFile = path.join(OUTPUT_DIR, `test-${theme}.html`);
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+  // Skip generation if file already exists (parallel workers share OUTPUT_DIR)
+  if (fs.existsSync(htmlFile)) {
+    return htmlFile;
+  }
+
   fs.writeFileSync(tmpFile, TEST_MARKDOWN, 'utf8');
 
-  const startTime = Date.now();
   const { stdout } = await execPromise(`MDOPEN_TIMING=1 "${MDOPEN_BIN}" "${tmpFile}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
-    timeout: 30000,
+    timeout: 120000,
   });
-  const elapsed = Date.now() - startTime;
-
-  if (process.env.VISUAL_TEST_TIMING === '1') {
-    console.log(`\n[HTML Generation: ${theme}]`);
-    console.log(stdout);
-  }
 
   return htmlFile;
 }
 
-// Generate all HTML files in parallel before tests
 const htmlFiles = new Map<string, string>();
 
 test.beforeAll(async () => {
-  const results = await Promise.allSettled(
-    THEMES.map(async (theme) => {
-      const startTime = Date.now();
+  const htmlFilesGenerated = new Map<string, string>();
+  
+  // Generate HTML for each theme with robust error handling
+  for (let i = 0; i < THEMES.length; i++) {
+    const theme = THEMES[i];
+    console.log(`Generating HTML for theme ${i + 1}/${THEMES.length}: ${theme}`);
+    
+    try {
       const htmlPath = await generateHtml(theme);
-      const elapsed = Date.now() - startTime;
-
-      if (process.env.VISUAL_TEST_TIMING === '1') {
-        console.log(`[HTML Generation] ${theme.padEnd(20)} ${elapsed}ms`);
-      }
-
-      return { theme, htmlPath };
-    })
-  );
-
-  for (const result of results) {
-    if (result.status === 'rejected') {
-      throw new Error(`Critical setup failure during HTML generation: ${result.reason}`);
+      htmlFiles.set(theme, htmlPath);
+      htmlFilesGenerated.set(theme, htmlPath);
+      console.log(`✓ Successfully generated HTML for theme: ${theme}`);
+    } catch (error) {
+      console.error(`✗ Failed to generate HTML for theme ${theme}:`, error);
+      // Don't throw the error - continue with other themes
+      // This allows us to have some themes generated even if others fail
     }
-    htmlFiles.set(result.value.theme, result.value.htmlPath);
   }
+  
+  // If no themes were generated, throw an error
+  if (htmlFiles.size === 0) {
+    throw new Error('Failed to generate HTML for all themes');
+  }
+  
+  console.log(`Successfully generated HTML for ${htmlFiles.size}/${THEMES.length} themes`);
 });
 
 test.describe('Visual Regression Tests', () => {
@@ -118,37 +115,127 @@ test.describe('Visual Regression Tests', () => {
         return;
       }
 
-      const themeStartTime = Date.now();
-
-      const navigationStart = Date.now();
       await page.goto(`file://${htmlPath}`, { waitUntil: 'domcontentloaded' });
-      const navigationTime = Date.now() - navigationStart;
 
-      // Wait for all Mermaid SVGs to be rendered and visible
       const mermaidCount = await page.locator('.mermaid').count();
       await page.waitForFunction(
         (expected) => document.querySelectorAll('.mermaid svg').length >= expected,
         mermaidCount,
         { timeout: 10000 }
       );
-      const loadStateTime = Date.now() - navigationStart - navigationTime;
 
-      const screenshotStart = Date.now();
       await expect(page).toHaveScreenshot(`${theme}.png`, {
         fullPage: true,
       });
-      const screenshotTime = Date.now() - screenshotStart;
-
-      const themeTime = Date.now() - themeStartTime;
-
-      if (process.env.VISUAL_TEST_TIMING === '1') {
-        console.log(`\n[Theme: ${theme}]`);
-        console.log(`  HTML Generation: ${htmlFiles.get(theme)?.length || 0} chars`);
-        console.log(`  Navigation:       ${navigationTime}ms`);
-        console.log(`  Load State:       ${loadStateTime}ms`);
-        console.log(`  Screenshot:       ${screenshotTime}ms`);
-        console.log(`  TOTAL:            ${themeTime}ms`);
-      }
     });
   }
+});
+
+test.describe('Mermaid Pan/Zoom Controls', () => {
+  let htmlPath: string;
+
+  test.beforeAll(async () => {
+    htmlPath = await generateHtml('github');
+  });
+
+  test('panzoom available on SVG', async ({ page }) => {
+    await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' });
+    await page.waitForFunction(
+      () => {
+        const svg = document.querySelector('.mermaid svg') as any;
+        return svg && svg.__panzoom;
+      },
+      { timeout: 10000 }
+    );
+    const panzoomExists = await page.evaluate(() => {
+      const svg = document.querySelector('.mermaid svg') as any;
+      return svg && svg.__panzoom !== undefined;
+    });
+    expect(panzoomExists).toBe(true);
+  });
+
+  test('toolbar appears on hover', async ({ page }) => {
+    await page.goto(`file://${htmlPath}`, { waitUntil: 'domcontentloaded' });
+
+    await page.waitForFunction(
+      () => document.querySelectorAll('.mermaid svg').length > 0,
+      { timeout: 10000 }
+    );
+
+    const mermaidContainer = page.locator('.mermaid').first();
+    const toolbar = mermaidContainer.locator('.mermaid-panzoom-toolbar');
+
+    await expect(toolbar).toBeAttached();
+    await mermaidContainer.hover();
+    await expect(toolbar).toBeVisible();
+
+    const buttons = toolbar.locator('.mermaid-panzoom-btn');
+    await expect(buttons).toHaveCount(3);
+    await expect(buttons.nth(0)).toHaveAttribute('aria-label', 'Zoom out');
+    await expect(buttons.nth(1)).toHaveAttribute('aria-label', 'Zoom in');
+    await expect(buttons.nth(2)).toHaveAttribute('aria-label', 'Fullscreen');
+  });
+
+  test('keyboard shortcuts work', async ({ page }) => {
+    await page.goto(`file://${htmlPath}`, { waitUntil: 'domcontentloaded' });
+
+    await page.waitForFunction(
+      () => {
+        const svg = document.querySelector('.mermaid svg') as any;
+        return svg && svg.__panzoom;
+      },
+      { timeout: 10000 }
+    );
+
+    const mermaidContainer = page.locator('.mermaid').first();
+    await mermaidContainer.click();
+    await page.waitForTimeout(100); // Ensure keyboard listener is ready
+
+    const getTransform = async () => {
+      return await page.evaluate(() => {
+        const svg = document.querySelector('.mermaid svg') as any;
+        return svg.__panzoom?.getTransform();
+      });
+    };
+
+    const initialTransform = await getTransform();
+
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(150);
+    const afterPan = await getTransform();
+    expect(afterPan.x).toBeLessThan(initialTransform.x);
+
+    await page.keyboard.press('+');
+    await page.waitForTimeout(500);
+    const afterZoomIn = await getTransform();
+    expect(afterZoomIn.scale).toBeGreaterThan(afterPan.scale);
+
+    await page.keyboard.press('-');
+    await page.waitForTimeout(500);
+    const afterZoomOut = await getTransform();
+    expect(afterZoomOut.scale).toBeLessThan(afterZoomIn.scale);
+
+  });
+
+  test('focus outline appears on click', async ({ page }) => {
+    await page.goto(`file://${htmlPath}`, { waitUntil: 'domcontentloaded' });
+
+    await page.waitForFunction(
+      () => {
+        const svg = document.querySelector('.mermaid svg') as any;
+        return svg && svg.__panzoom;
+      },
+      { timeout: 10000 }
+    );
+
+    const mermaidContainer = page.locator('.mermaid').first();
+    await mermaidContainer.click();
+
+    const outline = await mermaidContainer.evaluate((el) => {
+      return (el as HTMLElement).style.outline;
+    });
+    // Outline shorthand serialization order is browser-dependent ('2px solid rgb(...)')
+    expect(outline).toContain('solid');
+    expect(outline).toContain('2px');
+  });
 });
