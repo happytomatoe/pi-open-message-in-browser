@@ -136,13 +136,13 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
     await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' });
     await page.waitForFunction(
       () => {
-        const svg = document.querySelector('.mermaid svg');
+        const svg = document.querySelector('.mermaid svg') as any;
         return svg && svg.__panzoom;
       },
       { timeout: 10000 }
     );
     const panzoomExists = await page.evaluate(() => {
-      const svg = document.querySelector('.mermaid svg');
+      const svg = document.querySelector('.mermaid svg') as any;
       return svg && svg.__panzoom !== undefined;
     });
     expect(panzoomExists).toBe(true);
@@ -175,7 +175,7 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
 
     await page.waitForFunction(
       () => {
-        const svg = document.querySelector('.mermaid svg');
+        const svg = document.querySelector('.mermaid svg') as any;
         return svg && svg.__panzoom;
       },
       { timeout: 10000 }
@@ -187,7 +187,7 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
 
     const getTransform = async () => {
       return await page.evaluate(() => {
-        const svg = document.querySelector('.mermaid svg')!;
+        const svg = document.querySelector('.mermaid svg') as any;
         return svg.__panzoom?.getTransform();
       });
     };
@@ -216,7 +216,7 @@ test.describe('Mermaid Pan/Zoom Controls', () => {
 
     await page.waitForFunction(
       () => {
-        const svg = document.querySelector('.mermaid svg');
+        const svg = document.querySelector('.mermaid svg') as any;
         return svg && svg.__panzoom;
       },
       { timeout: 10000 }
