@@ -20,11 +20,15 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:
-      - run: apt-get update -qq && apt-get install -y -qq unzip curl > /dev/null 2>&1 && curl -fsSL https://bun.sh/install | bash && echo "/root/.bun/bin" >> $GITHUB_PATH
       - uses: actions/checkout@v4
-      - run: bun install
-      - run: cd packages/mdopen && bun run build:bin
-      - run: cd packages/mdopen && bun run test:visual
+      - run: |
+          apt-get update -qq && apt-get install -y -qq unzip curl > /dev/null 2>&1
+          curl -fsSL https://bun.sh/install | bash
+          export BUN_INSTALL=/root/.bun
+          export PATH=$BUN_INSTALL/bin:$PATH
+          bun install
+          cd packages/mdopen && bun run build:bin
+          bun run test:visual
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -37,11 +41,15 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:
-      - run: apt-get update -qq && apt-get install -y -qq unzip curl > /dev/null 2>&1 && curl -fsSL https://bun.sh/install | bash && echo "/root/.bun/bin" >> $GITHUB_PATH
       - uses: actions/checkout@v4
-      - run: bun install
-      - run: cd packages/mdopen && bun run build:bin
-      - run: cd packages/mdopen && bunx playwright test tests/mermaid-gallery.spec.ts
+      - run: |
+          apt-get update -qq && apt-get install -y -qq unzip curl > /dev/null 2>&1
+          curl -fsSL https://bun.sh/install | bash
+          export BUN_INSTALL=/root/.bun
+          export PATH=$BUN_INSTALL/bin:$PATH
+          bun install
+          cd packages/mdopen && bun run build:bin
+          bunx playwright test tests/mermaid-gallery.spec.ts
       - if: failure()
         uses: actions/upload-artifact@v4
         with:
