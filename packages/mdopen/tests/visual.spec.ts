@@ -73,18 +73,13 @@ async function generateHtml(theme: string): Promise<string> {
 const htmlFiles = new Map<string, string>();
 
 test.beforeAll(async () => {
-  const results = await Promise.allSettled(
-    THEMES.map(async (theme) => {
+  for (const theme of THEMES) {
+    try {
       const htmlPath = await generateHtml(theme);
-      return { theme, htmlPath };
-    })
-  );
-
-  for (const result of results) {
-    if (result.status === 'rejected') {
-      throw new Error(`Critical setup failure during HTML generation: ${result.reason}`);
+      htmlFiles.set(theme, htmlPath);
+    } catch (error) {
+      throw new Error(`Failed to generate HTML for theme ${theme}: ${error}`);
     }
-    htmlFiles.set(result.value.theme, result.value.htmlPath);
   }
 });
 
