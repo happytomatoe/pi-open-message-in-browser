@@ -18,41 +18,23 @@ function getThemeCssPaths(theme: Theme): string[] {
     return [path.join(THEMES_DIR, 'github.css')];
 }
 
-/**
- * Get Shiki CSS for theme switching using CSS variables.
- * Shiki emits inline styles with --shiki-light and --shiki-dark variables.
- */
-function getShikiCss(): string {
-    return `
-/* Shiki CSS variables theme support */
-@media (prefers-color-scheme: dark) {
-  .shiki, .shiki span { color: var(--shiki-dark) !important; }
-}
-@media (prefers-color-scheme: light) {
-  .shiki, .shiki span { color: var(--shiki-light) !important; }
-}
-
-/* Ensure code blocks have proper whitespace */
-code[class*=language-], pre[class*=language-], pre.shiki, pre.shiki code {
-  white-space: pre;
-}
-`;
-}
-
 export async function getAssets(theme: Theme = 'light', markdown?: string): Promise<{ css: string, js: string }> {
     try {
         const cssPaths = getThemeCssPaths(theme);
         const mermaidJsPath = require.resolve('mermaid/dist/mermaid.min.js');
 
-        // CSS: theme(s) + Shiki CSS variables support
+        // CSS: theme(s)
         let css = cssPaths.map(p => fs.readFileSync(p, 'utf8')).join('\n');
-        css += '\n' + getShikiCss();
 
-        // JS: Only mermaid and panzoom (no Prism.js needed - highlighting is server-side)
+        // JS: Mermaid + Prism + Panzoom
         let js = '';
 
         // Mermaid
         js += fs.readFileSync(mermaidJsPath, 'utf8');
+
+        // Prism
+        const prismJsPath = require.resolve('prismjs/prism.js');
+        js += '\n' + fs.readFileSync(prismJsPath, 'utf8');
 
         // Panzoom
         const panzoomJsPath = require.resolve('panzoom/dist/panzoom.min.js');
