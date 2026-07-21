@@ -22,16 +22,12 @@ test.beforeAll(async () => {
 
   for (const theme of THEMES) {
     const htmlFile = path.join(OUTPUT_DIR, `gallery-${theme}.html`);
-    await execPromise(`"${MDOPEN_BIN}" "${GALLERY_MD}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
-      timeout: 30000,
-    });
+    if (!fs.existsSync(htmlFile)) {
+      await execPromise(`"${MDOPEN_BIN}" "${GALLERY_MD}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
+        timeout: 30000,
+      });
+    }
     htmlFiles.set(theme, htmlFile);
-  }
-});
-
-test.afterAll(() => {
-  if (fs.existsSync(OUTPUT_DIR)) {
-    fs.rmSync(OUTPUT_DIR, { recursive: true, force: true });
   }
 });
 

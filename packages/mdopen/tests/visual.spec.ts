@@ -61,6 +61,12 @@ async function generateHtml(theme: string): Promise<string> {
   const htmlFile = path.join(OUTPUT_DIR, `test-${theme}.html`);
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+
+  // Skip generation if file already exists (parallel workers share OUTPUT_DIR)
+  if (fs.existsSync(htmlFile)) {
+    return htmlFile;
+  }
+
   fs.writeFileSync(tmpFile, TEST_MARKDOWN, 'utf8');
 
   const { stdout } = await execPromise(`MDOPEN_TIMING=1 "${MDOPEN_BIN}" "${tmpFile}" --no-open --theme ${theme} --out "${htmlFile}" --no-validate-mermaid`, {
