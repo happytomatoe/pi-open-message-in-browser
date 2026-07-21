@@ -27,12 +27,18 @@ jobs:
       options: --user root
     steps:
       - name: Install system dependencies
-        run: dnf install -y unzip git
+        run: |
+          dnf install -y unzip git \
+            nspr nss dbus-libs atk at-spi2-atk cups-libs at-spi2-core \
+            libXcomposite libXdamage libXrandr mesa-libgbm pango alsa-lib \
+            libdrm libxkbcommon libXScrnSaver gtk3 libXtst \
+            xorg-x11-fonts-misc xorg-x11-fonts-75dpi xorg-x11-fonts-100dpi \
+            dejavu-sans-fonts dejavu-serif-fonts dejavu-sans-mono-fonts
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: cd packages/mdopen && bun run build:bin
-      - run: cd packages/mdopen && bunx playwright install chromium --with-deps
+      - run: cd packages/mdopen && bunx playwright install chromium
       - run: cd packages/mdopen && bun run test:visual
       - if: failure()
         uses: actions/upload-artifact@v4
@@ -48,12 +54,18 @@ jobs:
       options: --user root
     steps:
       - name: Install system dependencies
-        run: dnf install -y unzip git
+        run: |
+          dnf install -y unzip git \
+            nspr nss dbus-libs atk at-spi2-atk cups-libs at-spi2-core \
+            libXcomposite libXdamage libXrandr mesa-libgbm pango alsa-lib \
+            libdrm libxkbcommon libXScrnSaver gtk3 libXtst \
+            xorg-x11-fonts-misc xorg-x11-fonts-75dpi xorg-x11-fonts-100dpi \
+            dejavu-sans-fonts dejavu-serif-fonts dejavu-sans-mono-fonts
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install
       - run: cd packages/mdopen && bun run build:bin
-      - run: cd packages/mdopen && bunx playwright install chromium --with-deps
+      - run: cd packages/mdopen && bunx playwright install chromium
       - run: cd packages/mdopen && bunx playwright test tests/mermaid-gallery.spec.ts --workers=1
       - if: failure()
         uses: actions/upload-artifact@v4
