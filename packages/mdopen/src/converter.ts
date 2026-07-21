@@ -2,7 +2,7 @@ import * as yaml from 'js-yaml';
 import * as toml from 'toml';
 import type { Theme } from './types';
 import { type CompilerName, type CompilerOptions, getDefaultCompiler, getCompiler } from './compilers';
-import { getHighlighter, extractLanguagesFromMarkdown, loadLanguages } from './highlighter';
+import { getHighlighter, extractLanguagesFromMarkdown, loadLanguages, isLanguageSupported } from './highlighter';
 import type { BundledLanguage } from 'shiki';
 
 /** Extracts YAML or TOML frontmatter from markdown. */
@@ -68,6 +68,11 @@ async function highlightCodeBlocks(html: string, markdown: string): Promise<stri
     const key = `${lang}:${code.substring(0, 50)}`;
     if (seen.has(key)) continue;
     seen.add(key);
+    
+    // Skip unsupported languages
+    if (!isLanguageSupported(lang)) {
+      continue;
+    }
     
     try {
       // Load language if not already loaded

@@ -1,4 +1,6 @@
-import { createHighlighter, type Highlighter, type BundledLanguage } from 'shiki';
+import { createHighlighter, type Highlighter, type BundledLanguage, bundledLanguages } from 'shiki';
+
+const SUPPORTED_LANGUAGES = new Set(Object.keys(bundledLanguages));
 
 let highlighterPromise: Promise<Highlighter> | null = null;
 
@@ -17,12 +19,21 @@ export function getHighlighter(): Promise<Highlighter> {
 }
 
 /**
+ * Check if a language is supported by Shiki.
+ */
+export function isLanguageSupported(lang: string): boolean {
+  return SUPPORTED_LANGUAGES.has(lang as BundledLanguage);
+}
+
+/**
  * Load required languages into the highlighter.
  * Swallows errors for unknown languages.
  */
 export async function loadLanguages(highlighter: Highlighter, languages: string[]): Promise<void> {
   await Promise.all(
-    languages.map((lang) => highlighter.loadLanguage(lang as BundledLanguage).catch(() => {}))
+    languages
+      .filter((lang) => isLanguageSupported(lang))
+      .map((lang) => highlighter.loadLanguage(lang as BundledLanguage).catch(() => {}))
   );
 }
 
