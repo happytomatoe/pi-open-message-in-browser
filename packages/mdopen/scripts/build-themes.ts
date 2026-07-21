@@ -89,26 +89,9 @@ async function buildThemes() {
         }
       }
 
-      // Copy Prism themes
-      const prismDir = path.dirname(require.resolve('prismjs/package.json'));
-      const prismThemesDir = path.join(prismDir, 'themes');
-      const prismThemes = [
-        { src: 'prism.css', dest: 'prism.css' },
-        { src: 'prism-dark.css', dest: 'prism-dark.css' },
-      ];
-
-      for (const { src, dest } of prismThemes) {
-        const srcPath = path.join(prismThemesDir, src);
-        const destPath = path.join(THEMES_DIR, dest);
-        if (fs.existsSync(srcPath)) {
-          const css = fs.readFileSync(srcPath, 'utf8');
-          const minified = csso.minify(css).css;
-          fs.writeFileSync(destPath, minified);
-          console.log(`Built ${dest}`);
-        }
-      }
+      // Note: Prism themes are no longer needed - Shiki handles syntax highlighting server-side
     } catch (e) {
-      console.error('Failed to process GitHub or Prism themes:', e);
+      console.error('Failed to process GitHub themes:', e);
       process.exit(1);
     }
 

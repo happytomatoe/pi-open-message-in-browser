@@ -1,6 +1,6 @@
 #!/bin/bash
 # Screenshot comparison test for mdopen
-# Uses Puppeteer for reliable JS execution (TOC, Mermaid, Prism)
+# Uses Puppeteer for reliable JS execution (TOC, Mermaid, Shiki)
 
 set -e
 
@@ -71,7 +71,7 @@ echo ""
 echo "=== Verify ==="
 echo "  - TOC sidebar: check toc variant for left sidebar with heading links"
 echo "  - Dark theme: check github-dark variant for proper dark colors"
-echo "  - Code highlighting: check for Prism.js syntax coloring"
+echo "  - Code highlighting: check for Shiki syntax coloring"
 echo "  - Mermaid diagrams: check for flowchart/sequence/class diagrams"
 echo "  - Task lists: check for checkbox rendering"
 echo "  - MathJax: check math variant (requires CDN, may not render headless)"

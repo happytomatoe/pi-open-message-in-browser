@@ -457,8 +457,16 @@ export function generateHtmlDocument(
     ._theme-water-dark pre > div.mermaid { padding: 0; background: none; border-radius: 0; }
     ._theme-water-dark pre:has(> div.mermaid) { padding: 10px; background: #161f27; border-radius: 6px; }
 
-    /* Prism init */
-    code[class*=language-], pre[class*=language-] {
+    /* Shiki syntax highlighting - uses CSS variables for theme switching */
+    .shiki, .shiki span {
+      color: var(--shiki-light) !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      .shiki, .shiki span {
+        color: var(--shiki-dark) !important;
+      }
+    }
+    code[class*=language-], pre[class*=language-], pre.shiki, pre.shiki code {
       white-space: pre;
     }
 
@@ -619,11 +627,6 @@ export function generateHtmlDocument(
 
     // Mermaid
     ${js}
-    
-    // Prism highlighting (must be after JS assets are loaded)
-    if (typeof Prism !== 'undefined') {
-      Prism.highlightAll();
-    }
     
     // Auto theme color detection
     var isDark = document.body.classList.contains('_color-dark') ||
