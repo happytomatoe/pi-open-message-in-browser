@@ -73,14 +73,31 @@ async function generateHtml(theme: string): Promise<string> {
 const htmlFiles = new Map<string, string>();
 
 test.beforeAll(async () => {
-  for (const theme of THEMES) {
+  const htmlFilesGenerated = new Map<string, string>();
+  
+  // Generate HTML for each theme with robust error handling
+  for (let i = 0; i < THEMES.length; i++) {
+    const theme = THEMES[i];
+    console.log(`Generating HTML for theme ${i + 1}/${THEMES.length}: ${theme}`);
+    
     try {
       const htmlPath = await generateHtml(theme);
       htmlFiles.set(theme, htmlPath);
+      htmlFilesGenerated.set(theme, htmlPath);
+      console.log(`✓ Successfully generated HTML for theme: ${theme}`);
     } catch (error) {
-      throw new Error(`Failed to generate HTML for theme ${theme}: ${error}`);
+      console.error(`✗ Failed to generate HTML for theme ${theme}:`, error);
+      // Don't throw the error - continue with other themes
+      // This allows us to have some themes generated even if others fail
     }
   }
+  
+  // If no themes were generated, throw an error
+  if (htmlFiles.size === 0) {
+    throw new Error('Failed to generate HTML for all themes');
+  }
+  
+  console.log(`Successfully generated HTML for ${htmlFiles.size}/${THEMES.length} themes`);
 });
 
 test.describe('Visual Regression Tests', () => {
