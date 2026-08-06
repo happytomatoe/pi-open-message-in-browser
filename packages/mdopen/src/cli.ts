@@ -192,7 +192,7 @@ export async function main(argv: string[] = process.argv.slice(2)): Promise<void
     const endConvert = performance.now();
 
     const startAssets = performance.now();
-    const { css, js } = await getAssets(args.theme);
+    const { css, js } = await getAssets(args.theme, markdown);
     const endAssets = performance.now();
 
     const startTemplate = performance.now();
