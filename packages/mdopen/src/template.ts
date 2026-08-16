@@ -137,6 +137,12 @@ export function generateHtmlDocument(
       word-wrap: break-word;
       visibility: hidden;
     }
+    #_html {
+      max-width: 1012px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      box-sizing: border-box;
+    }
     body._toc-left { padding-left: 300px !important; }
     body._toc-right { padding-right: 300px !important; }
 
@@ -372,13 +378,21 @@ export function generateHtmlDocument(
       background-color: #fff;
     }
     ._theme-github .markdown-body {
-      overflow: auto;
       width: 100%;
       max-width: 830px;
       padding: 32px;
       margin: 20px auto !important;
-      border: 1px solid #e1e4e8;
       box-sizing: border-box;
+      overflow: visible;
+    }
+    /* Let wide tables break out of the container and center on viewport */
+    ._theme-github .markdown-body table,
+    ._theme-github-dark .markdown-body table {
+      display: table !important;
+      width: max-content !important;
+      margin-left: 50% !important;
+      transform: translateX(-50%);
+      overflow: visible !important;
     }
     ._theme-github .markdown-body img {
       background-color: transparent;
@@ -387,13 +401,15 @@ export function generateHtmlDocument(
       background-color: #0d1117;
     }
     ._theme-github-dark .markdown-body {
-      overflow: auto;
       width: 100%;
       max-width: 830px;
       padding: 32px;
       margin: 20px auto !important;
-      border: 1px solid #30363d;
       box-sizing: border-box;
+      overflow: visible;
+    }
+    }
+    }
     }
     ._theme-github-dark a {
       color: #4493f8 !important;
