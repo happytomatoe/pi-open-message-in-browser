@@ -1,6 +1,4 @@
-install:
-    cd packages/mdopen && bun run build && bun link
-    pi install packages/pi-open-message-in-browser
+install: install-cli install-extension
 
 install-cli:
     cd packages/mdopen && bun run build && bun link
