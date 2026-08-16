@@ -408,9 +408,6 @@ export function generateHtmlDocument(
       box-sizing: border-box;
       overflow: visible;
     }
-    }
-    }
-    }
     ._theme-github-dark a {
       color: #4493f8 !important;
     }
