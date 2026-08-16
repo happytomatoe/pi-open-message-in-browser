@@ -21,7 +21,8 @@
     "test:visual:update": "bun run build:bin && playwright test tests/visual.spec.ts --update-snapshots",
     "test:visual:report": "playwright show-report playwright-report",
     "prepublishOnly": "bun run build",
-    "cpd": "jscpd src/"
+    "cpd": "jscpd src/",
+    "validate:html": "bun run scripts/validate-html.ts"
   },
   "dependencies": {
     "commonmark": "^0.30.0",
@@ -49,6 +50,7 @@
     "@types/markdown-it": "^14.0.0",
     "@types/node": "^26.1.0",
     "csso": "^5.0.5",
+    "html-validate": "^11.6.2",
     "jscpd": "^5.0.12",
     "typescript": "^5.5.0"
   },

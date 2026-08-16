@@ -616,12 +616,10 @@ export function generateHtmlDocument(
       }
     }
   </style>
-
-  </script>
   </head>
 <body class="${bodyClasses.join(' ')}">
   ${toc ? '<div id="_toc" class="tex2jax-ignore"></div>' : ''}
-  <div id="_html" class="${contentClass}${widthClass}">
+  <div id="html" class="${contentClass}${widthClass}">
     ${body}
   </div>
   <script>
@@ -851,7 +849,7 @@ export function generateHtmlDocument(
 
     // Emoji
     ${emoji ? EMOJI_SCRIPT + `
-    document.getElementById('_html').innerHTML = emojinator(document.getElementById('_html').innerHTML);
+    document.getElementById('html').innerHTML = emojinator(document.getElementById('html').innerHTML);
     ` : ''}
   </script>
   ${math ? `<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>` : ''}
