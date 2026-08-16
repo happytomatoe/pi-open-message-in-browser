@@ -374,6 +374,15 @@ export function generateHtmlDocument(
     }
 
     /* GitHub theme specifics */
+    /* Center headings */
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+      text-align: center;
+    }
     ._theme-github {
       background-color: #fff;
     }
