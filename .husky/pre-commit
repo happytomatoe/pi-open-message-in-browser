@@ -1,2 +1,4 @@
-echo "Running type check..."
+echo "Running type check and build..."
 bun run --filter '*' build
+echo "Validating HTML output..."
+cd packages/mdopen && bun run validate:html
